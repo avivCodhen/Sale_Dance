@@ -12,6 +12,8 @@ using Microsoft.EntityFrameworkCore;
 using Sale_Dance.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Sale_Dance.Services;
+using Sale_Dance.Services.Interfaces;
 
 namespace Sale_Dance
 {
@@ -35,12 +37,28 @@ namespace Sale_Dance
             });
 
             services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(
-                    Configuration.GetConnectionString("DefaultConnection")));
-            services.AddDefaultIdentity<IdentityUser>()
-                .AddEntityFrameworkStores<ApplicationDbContext>();
+            {
+                options
+                .UseSqlServer(
+                    Configuration.GetConnectionString("DefaultConnection"));
+            }
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+                    );
+            services.AddIdentity<IdentityUser, IdentityRole>()
+                .AddEntityFrameworkStores<ApplicationDbContext>()
+                .AddDefaultUI()
+                .AddDefaultTokenProviders();
+
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            //services.AddDefaultIdentity<IdentityUser>()
+            //    .AddEntityFrameworkStores<ApplicationDbContext>();
+
+            services.AddScoped<ISalePostService, SalePostService>();
+            services.AddScoped<IPublishedPostsService, PublishedPostsService>();
+            
+            services.AddMvc()
+                .SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
+                .AddJsonOptions(x => x.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -68,6 +86,16 @@ namespace Sale_Dance
                 routes.MapRoute(
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
+
+                routes.MapRoute(
+           name: "areas",
+           template: "{area=Admin}/{controller=Admin}/{action=Index}/{id?}"
+         );
+            });
+
+            AutoMapper.Mapper.Initialize(cfg =>
+            {
+
             });
         }
     }

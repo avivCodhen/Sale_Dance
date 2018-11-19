@@ -1,0 +1,80 @@
+﻿@model Sale_Dance.Models.ViewModel.PostViewModel
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<br />
+
+<h2 class="text-info">ערוך פוסט</h2>
+
+<form method="post" asp-action="Edit">
+    <input type="hidden" asp-for="Post.id" />
+    <div class="p-4 border rounded">
+
+        <div asp-validation-summary"ModelOnly" class="text-danger"></div>
+        <div class="form-group row">
+
+            <div class="col-2">
+
+                <label> שם</label>
+            </div>
+            <div class="col-5">
+                <input asp-for="Post.Name" class="form-control" />
+            </div>
+        </div>
+        <div class="form-group row">
+
+            <div class="col-2">
+
+                <label>תוכן הפוסט</label>
+            </div>
+            <div class="col-5">
+                <textarea asp-for="Post.Body" row="4" class="form-control"></textarea>
+            </div>
+            <span asp-validation-for="Post.Body" class="text-danger"></span>
+        </div>
+
+
+        <br />
+        <h4>הוסף מבצעים לפוסט</h4>
+        <br />
+
+
+        <table>
+
+            @for (var i = 0; i < Model.SelectedListItem.Capacity; i++)
+            {
+                <tr>
+
+                    <td>
+
+                        @Html.HiddenFor(x => Model.SelectedListItem[i].Value)
+                        @Html.DisplayFor(t => Model.SelectedListItem[i].Text)
+                    </td>
+                    <td>
+                        @Html.CheckBoxFor(t => Model.SelectedListItem[i].Selected)
+                    </td>
+                </tr>
+            }
+        </table>
+
+
+    </div>
+
+        <br />
+
+        <div class="form-group text-left">
+
+            <input type="submit" class="btn btn-primary" asp-route-id="@Model.Post.id" value="שמור שינויים" />
+            <a asp-action="Index" class="btn btn-success">חזרה לפוסטים</a>
+
+        </div>
+    </div>
+</form>
+
+@section Scripts{
+
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

@@ -1,0 +1,60 @@
+﻿@model IEnumerable<Sale_Dance.Models.Sale>
+
+@{
+    ViewData["Title"] = "מבצעים";
+}
+<br />
+<br />
+
+<div dir="rtl" class="text-right">
+    <div class="row">
+
+        <div class="col-6">
+
+            <h2 class="text-info ">  מבצעים</h2>
+        </div>
+
+        <div class="col-6 text-left">
+
+            <a asp-action="Create" class="btn btn-info "> <i class="fas fa-plus"></i>&nbsp; מבצע חדש</a>
+        </div>
+
+    </div>
+
+    <br />
+
+    <table class="table table-striped border">
+
+        <tr class="table-info ">
+
+            <th>
+                שם
+            </th>
+            <th>
+                מחיר לפני
+            </th>
+            <th>
+                מחיר אחרי
+            </th>
+            <th></th>
+            <th></th>
+        </tr>
+
+        @foreach (var item in Model)
+        {
+            <tr>
+
+                <td class="align-middle">
+                    @Html.DisplayFor(m => item.Name)
+                </td>
+
+                <td>
+
+                    <partial name="_SalesTableButtonsPartialView" model="item" />
+                </td>
+
+            </tr>
+        }
+    </table>
+
+</div>

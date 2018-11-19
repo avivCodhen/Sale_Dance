@@ -1,0 +1,16 @@
+﻿@model  Sale_Dance.Models.ApplicationUser
+@*
+    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
+*@
+
+
+<td style="width:150px">
+
+    <div class="btn-group" role="group">
+       
+        <a type="button" class="btn btn-success m-1" href="@Url.Action("/Details/"+Model.Id)">פרטים</a>
+        <a type="button" class="btn btn-danger m-1" href="@Url.Action("/Delete/"+Model.Id)">מחק</a>
+
+
+    </div>
+</td>

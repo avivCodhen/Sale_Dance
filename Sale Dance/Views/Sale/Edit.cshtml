@@ -1,0 +1,102 @@
+﻿@model Sale_Dance.Models.Sale
+
+@{ 
+    ViewData["Title"] = "Edit";
+}
+<br />
+
+<h2 class="text-info">ערוך מבצע</h2>
+
+<form method="post" enctype="multipart/form-data" asp-action="Edit">
+
+    <div class="p-4 border rounded row">
+
+        <div asp-validation-summary"ModelOnly" class="text-danger"></div>
+
+        <div class="col-8">
+            <div class="form-group row">
+
+                <div class="col-4">
+
+                    <label> שם</label>
+
+                </div>
+                <div class="col-8">
+                    <input asp-for="Name" class="form-control" />
+                </div>
+                <span asp-validation-for="Name" class="text-danger"></span>
+
+            </div>
+
+            <div class="form-group row">
+
+                <div class="col-4">
+
+                    <label> תמונה</label>
+
+                </div>
+                <div class="col-8">
+                    <input type="file" name="files" class="form-control text-left" />
+                </div>
+
+            </div>
+
+            <div class="form-group row">
+
+                <div class="col-4">
+
+                    <label> מחיר לפני</label>
+
+                </div>
+                <div class="col-4">
+                    <input type="number" asp-for="BeforePrice" class="form-control" />
+                </div>
+                <span asp-validation-for="BeforePrice" class="text-danger"></span>
+
+            </div>
+
+            <div class="form-group row">
+
+                <div class="col-4">
+
+                    <label> מחיר אחרי</label>
+
+                </div>
+                <div class="col-4">
+                    <input asp-for="AfterPrice" class="form-control" />
+                </div>
+                <span asp-validation-for="AfterPrice" class="text-danger"></span>
+
+            </div>
+
+          
+        </div>
+
+        <div class="col-1">
+
+
+        </div>
+
+        <div class="col-3">
+
+            <img src="@Model.Image" width="100%" style="border-radius:5px; border:1px solid #bbb9b9;"/>
+        </div>
+
+        <br />
+        
+
+        <div class="form-group text-left">
+
+            <input type="submit" class="btn btn-primary" value="שמור שינויים" />
+            <a asp-action="Index" class="btn btn-success">חזרה למבצעים</a>
+
+        </div>
+    </div>
+</form>
+
+@section Scripts{
+
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

@@ -1,0 +1,77 @@
+﻿@model Sale_Dance.Models.Sale
+
+@{
+    ViewData["Title"] = "Details";
+}
+<br />
+
+<h2 class="text-info">@Model.Name</h2>
+
+<form method="post" enctype="multipart/form-data" asp-action="Edit">
+
+    <div class="p-4 border rounded row">
+
+        <div asp-validation-summary"ModelOnly" class="text-danger"></div>
+
+        <div class="col-8">
+         
+
+          
+            <div class="form-group row">
+
+                <div class="col-4">
+
+                    <label> מחיר לפני</label>
+
+                </div>
+                <div class="col-4">
+                    <label>@Model.BeforePrice</label>
+                </div>
+
+            </div>
+
+            <div class="form-group row">
+
+                <div class="col-4">
+
+                    <label> מחיר אחרי</label>
+
+                </div>
+                <div class="col-4">
+                    <label>@Model.AfterPrice</label>
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+        <div class="col-1">
+
+
+        </div>
+
+        <div class="col-3">
+
+            <img src="@Model.Image" width="100%" style="border-radius:5px; border:1px solid #bbb9b9;" />
+        </div>
+
+        <br />
+
+
+        <div class="form-group text-left">
+            <a asp-action="Edit" class="btn btn-primary" asp-route-id="@Model.id" >ערוך מבצע</a>
+            <a asp-action="Delete" class="btn btn-danger" asp-route-id="@Model.id" >מחק מבצע</a>
+            <a asp-action="Index" class="btn btn-success">חזרה למבצעים</a>
+
+        </div>
+    </div>
+</form>
+
+@section Scripts{
+
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

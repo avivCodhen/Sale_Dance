@@ -1,0 +1,173 @@
+﻿@model Sale_Dance.Models.Business
+@{
+    ViewData["Title"] = "פרטי העסק";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<br />
+
+@if(TempData["Success"] != null)
+{
+    <div class="alert alert-success" role="alert">@TempData["Success"]</div>
+}
+
+<h2 class="text-info">פרטי עסק</h2>
+
+<form method="post" asp-action="Update">
+    <input type="hidden" asp-for="id" />
+
+    <div class="p-4 border rounded">
+
+        <div asp-validation-summary"ModelOnly" class="text-danger"></div>
+        <div class="form-group row">
+
+            <div class="col-2">
+
+                <label> כותרת לעסק</label>
+            </div>
+            <div class="col-5">
+                <input asp-for="Name" class="form-control" />
+            </div>
+            <span asp-validation-for="Name" class="text-danger"></span>
+
+        </div>
+
+        <div class="form-group row">
+
+            <div class="col-2">
+
+                <label> טלפון ליצירת קשר</label>
+            </div>
+            <div class="col-5">
+                <input asp-for="BusinessPhoneContact" class="form-control" />
+            </div>
+            <span asp-validation-for="BusinessPhoneContact" class="text-danger"></span>
+
+        </div>
+
+        <div class="form-group row">
+
+            <div class="col-2">
+
+                <label> מייל ליצירת קשר</label>
+            </div>
+            <div class="col-5">
+                <input asp-for="BusinessEmailContact" class="form-control" />
+            </div>
+            <span asp-validation-for="BusinessEmailContact" class="text-danger"></span>
+
+        </div>
+
+        <div class="form-group row">
+
+            <div class="col-2">
+
+                <label> אתר העסק</label>
+            </div>
+            <div class="col-5">
+                <input asp-for="Site" class="form-control" />
+            </div>
+            <span asp-validation-for="Site" class="text-danger"></span>
+
+        </div>
+
+        <div class="form-group row">
+
+            <div class="col-2">
+
+                <label> כתובת העסק</label>
+            </div>
+            <div class="col-5">
+                <input asp-for="Address" class="form-control" />
+            </div>
+            <span asp-validation-for="Address" class="text-danger"></span>
+
+        </div>
+
+        <div class="form-group row">
+
+            <div class="col-2">
+
+                <label> פרטים על העסק</label>
+            </div>
+            <div class="col-5">
+                <input asp-for="About" class="form-control" />
+            </div>
+            <span asp-validation-for="About" class="text-danger"></span>
+
+        </div>
+
+        <div class="form-group row">
+
+            <div class="col-2">
+
+                <label> תמונה של העסק</label>
+            </div>
+            <div class="col-5">
+                <input asp-for="Site" class="form-control" />
+            </div>
+            <span asp-validation-for="Site" class="text-danger"></span>
+
+        </div>
+
+        <div class="form-group row">
+
+            <div class="col-2">
+
+                <label> פתיחה וסגירה בימות השבוע</label>
+            </div>
+            <div class="col-5">
+                <input asp-for="WeekDays" class="form-control" />
+            </div>
+            <span asp-validation-for="WeekDays" class="text-danger"></span>
+
+        </div>
+
+        <div class="form-group row">
+
+            <div class="col-2">
+
+                <label> פתיחה וסגירה בשישי</label>
+            </div>
+            <div class="col-5">
+                <input asp-for="Friday" class="form-control" />
+            </div>
+            <span asp-validation-for="Friday" class="text-danger"></span>
+
+        </div>
+
+
+        <div class="form-group row">
+
+            <div class="col-2">
+
+                <label> פתיחה וסגיר בשבת</label>
+            </div>
+            <div class="col-5">
+                <input asp-for="Saturday" class="form-control" />
+            </div>
+            <span asp-validation-for="Saturday" class="text-danger"></span>
+
+        </div>
+
+
+
+
+        <br />
+
+        <div class="form-group text-left">
+
+            <input type="submit" class="btn btn-primary" value="שמור שינויים" />
+
+
+        </div>
+    </div>
+</form>
+
+@section Scripts{
+
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

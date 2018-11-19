@@ -1,0 +1,37 @@
+﻿@model Sale_Dance.Models.Sale
+@{
+    ViewData["Title"] = "Delete";
+}
+
+<br />
+
+<h2 class="text-info">@Model.Name</h2>
+
+<form method="post" asp-action="Delete">
+    <div class="p-4 border rounded">
+
+        <div asp-validation-summary"ModelOnly" class="text-danger"></div>
+        <div class="form-group row">
+
+            <div class="col-2">
+
+            </div>
+
+        </div>
+
+        <br />
+
+        <div class="form-group text-left">
+            <input type="submit" asp-route-id="@Model.id" class="btn btn-danger" value="מחק מבצע" />
+            <a asp-action="Index" class="btn btn-success">חזרה למבצעים</a>
+
+        </div>
+    </div>
+</form>
+
+@section Scripts{
+
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

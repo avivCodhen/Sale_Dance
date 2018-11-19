@@ -1,0 +1,82 @@
+﻿@model  Sale_Dance.Models.ViewModel.PostViewModel
+@{
+    ViewData["Title"] = "Create";
+}
+
+<br />
+
+<h2 class="text-info">צור פוסט חדש</h2>
+
+<form method="post" asp-action="Create">
+
+    <div class="p-4 border rounded">
+
+        <div asp-validation-summary"ModelOnly" class="text-danger"></div>
+        <div class="form-group row">
+
+            <div class="col-2">
+
+                <label> כותרת</label>
+            </div>
+            <div class="col-5">
+                <input asp-for="@Model.Post.Name" class="form-control" />
+            </div>
+            <span asp-validation-for="@Model.Post.Name" class="text-danger"></span>
+
+        </div>
+
+        <div class="form-group row">
+
+            <div class="col-2">
+
+                <label> תוכן הפוסט</label>
+            </div>
+            <div class="col-5">
+                <textarea asp-for="@Model.Post.Body" class="form-control" rows="4"></textarea>
+            </div>
+            <span asp-validation-for="@Model.Post.Body" class="text-danger"></span>
+
+          
+        </div>
+          <br />
+            <h4>הוסף מבצעים לפוסט</h4>
+            <br />
+
+
+            <table>
+
+                @for (var i = 0; i < Model.SelectedListItem.Capacity; i++)
+                {
+                    <tr>
+
+                        <td>
+
+                            @Html.HiddenFor(x => Model.SelectedListItem[i].Value)
+                            @Html.DisplayFor(t => Model.SelectedListItem[i].Text)
+                        </td>
+                        <td>
+                            @Html.CheckBoxFor(t => Model.SelectedListItem[i].Selected)
+                        </td>
+                    </tr>
+                }
+            </table>
+
+        <br />
+
+        <div class="form-group text-left">
+
+            <input type="submit" class="btn btn-primary" value="צור פוסט" />
+            <a asp-action="Index" class="btn btn-success">חזרה לפוסטים</a>
+
+        </div>
+
+      
+    </div>
+</form>
+
+@section Scripts{
+
+    @{ 
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

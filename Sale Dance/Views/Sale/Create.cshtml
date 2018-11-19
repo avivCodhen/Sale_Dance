@@ -1,0 +1,100 @@
+﻿@model Sale_Dance.Models.ViewModel.SalesViewModel
+@{
+    ViewData["Title"] = "Create";
+}
+<br />
+
+<h2 class="text-info">צור מבצע חדש</h2>
+
+<form method="post" enctype="multipart/form-data" asp-action="Create">
+
+    <div class="p-4 border rounded">
+
+        <div asp-validation-summary"ModelOnly" class="text-danger"></div>
+        <div class="form-group row">
+
+            <div class="col-2">
+
+                <label> שם</label>
+
+            </div>
+            <div class="col-5">
+                <input asp-for="Sale.Name" class="form-control" />
+            </div>
+            <span asp-validation-for="Sale.Name" class="text-danger"></span>
+
+        </div>
+
+        <div class="form-group row">
+
+            <div class="col-2">
+
+                <label> תמונה</label>
+
+            </div>
+            <div class="col-5">
+                <input type="file" name="files"  class="form-control text-left" />
+            </div>
+
+        </div>
+
+        <div class="form-group row">
+
+            <div class="col-2">
+
+                <label> מחיר לפני</label>
+
+            </div>
+            <div class="col-2">
+                <input type="number" asp-for="Sale.BeforePrice" class="form-control" />
+            </div>
+            <span asp-validation-for="Sale.BeforePrice" class="text-danger"></span>
+
+        </div>
+
+        <div class="form-group row">
+
+            <div class="col-2">
+
+                <label> מחיר אחרי</label>
+
+            </div>
+            <div class="col-2">
+                <input asp-for="Sale.AfterPrice" class="form-control" />
+            </div>
+            <span asp-validation-for="Sale.AfterPrice" class="text-danger"></span>
+
+        </div>
+
+        <div class="form-group row">
+
+            <div class="col-2">
+
+                <label> מחיר אחרי</label>
+
+            </div>
+            <div class="col-5">
+                <input asp-for="Sale.Posts" class="form-control" />
+            </div>
+            <span asp-validation-for="Sale.Posts" class="text-danger"></span>
+
+        </div>
+
+
+        <br />
+
+        <div class="form-group text-left">
+
+            <input type="submit" class="btn btn-primary" value="צור פוסט" />
+            <a asp-action="Index" class="btn btn-success">חזרה למבצעים</a>
+
+        </div>
+    </div>
+</form>
+
+@section Scripts{
+
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
