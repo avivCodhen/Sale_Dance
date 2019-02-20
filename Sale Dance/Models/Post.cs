@@ -22,7 +22,7 @@ namespace Sale_Dance.Models
 
         public DateTime LastPublished{ get; set; }
 
-        public virtual List<SalePosts> Sales { get; set; }
+        public virtual List<SalePost> Sales { get; set; }
 
         public bool IsPublished { get; set; }
 

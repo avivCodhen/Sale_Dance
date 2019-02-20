@@ -1,4 +1,4 @@
-﻿@model Sale_Dance.Models.ViewModel.SalesViewModel
+﻿@model Sale_Dance.Models.ViewModel.SaleViewModel
 @{
     ViewData["Title"] = "Create";
 }
@@ -19,9 +19,9 @@
                 
             </div>
             <div class="col-5">
-                <input asp-for="Sale.Name" class="form-control" />
+                <input asp-for="Name" class="form-control" />
             </div>
-            <span asp-validation-for="Sale.Name" class="text-danger"></span>
+            <span asp-validation-for="Name" class="text-danger"></span>
 
         </div>
 
@@ -46,9 +46,9 @@
 
             </div>
             <div class="col-2">
-                <input type="number" asp-for="Sale.BeforePrice" class="form-control" />
+                <input type="number" asp-for="BeforePrice" class="form-control" />
             </div>
-            <span asp-validation-for="Sale.BeforePrice" class="text-danger"></span>
+            <span asp-validation-for="BeforePrice" class="text-danger"></span>
 
         </div>
 
@@ -60,9 +60,9 @@
 
             </div>
             <div class="col-2">
-                <input asp-for="Sale.AfterPrice" class="form-control" />
+                <input asp-for="AfterPrice" class="form-control" />
             </div>
-            <span asp-validation-for="Sale.AfterPrice" class="text-danger"></span>
+            <span asp-validation-for="AfterPrice" class="text-danger"></span>
 
         </div>
 

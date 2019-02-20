@@ -18,17 +18,17 @@ namespace Sale_Dance.Data
         protected override  void OnModelCreating(ModelBuilder modelBuilder)
         {
 
-            modelBuilder.Entity<SalePosts>()
+            modelBuilder.Entity<SalePost>()
                 .HasKey(t => new { t.SaleId, t.PostId });
 
-            modelBuilder.Entity<SalePosts>()
+            modelBuilder.Entity<SalePost>()
                 .HasOne(p => p.Post)
                 .WithMany(x => x.Sales)
                 .HasForeignKey(y => y.PostId);
 
-            modelBuilder.Entity<SalePosts>()
+            modelBuilder.Entity<SalePost>()
                .HasOne(p => p.Sale)
-               .WithMany(x => x.Posts)
+               .WithMany(x => x.SalePosts)
                .HasForeignKey(y => y.SaleId);
 
             base.OnModelCreating(modelBuilder);
@@ -40,7 +40,7 @@ namespace Sale_Dance.Data
         public DbSet<ApplicationUser> Users{ get; set; }
         public DbSet<PublishedPost> PublishedPosts{ get; set; }
         public DbSet<Business> Businesses{ get; set; }
-        public DbSet<SalePosts> SalePosts{ get; set; }
+        public DbSet<SalePost> SalePosts{ get; set; }
     }
 
     

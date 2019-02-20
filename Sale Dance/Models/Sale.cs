@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace Sale_Dance.Models
 {
@@ -10,18 +12,14 @@ namespace Sale_Dance.Models
     {
        [Key] public int id { get; set; }
 
-        public string OwnderId { get; set; }
-        [Required(ErrorMessage = "יש להזין שם")]
+        public string UserId { get; set; }
+        [ForeignKey("UserId")]
+        public virtual ApplicationUser User { get; set; }
         public string Name { get; set; }
         public byte[] Image { get; set; }
-
-        [Required(ErrorMessage = "יש להזין מחיר לפני")]
         public double BeforePrice { get; set; }
-
-        [Required(ErrorMessage = "יש להזין מחיר אחרי ההנחה")]
-
         public double AfterPrice { get; set; }
+        public virtual List<SalePost> SalePosts { get; set; }
 
-        public virtual List<SalePosts> Posts { get; set; }
     }
 }

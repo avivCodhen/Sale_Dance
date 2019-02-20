@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Sale_Dance.Data;
 using Sale_Dance.Models;
@@ -19,57 +20,59 @@ namespace Sale_Dance.Controllers
     public class SaleController : Controller
     {
         private readonly ApplicationDbContext db;
-        private readonly IHostingEnvironment hostingEnvironment;
-        private readonly IHttpContextAccessor httpContextAccessor;
-        private string userId;
+        private readonly SignInManager<ApplicationUser> _signInManager;
 
-        [BindProperty]
-        public SalesViewModel saleViewModel { get; set; }
-
-        public SaleController(ApplicationDbContext db, IHostingEnvironment hostingEnvironment, IHttpContextAccessor httpContextAccessor)
+        public SaleController(ApplicationDbContext db, SignInManager<ApplicationUser> signInManager)
 
         {
-            this.hostingEnvironment = hostingEnvironment;
             this.db = db;
-            this.httpContextAccessor = httpContextAccessor;
-            userId = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            saleViewModel = new SalesViewModel
-            {
-                Sale = new Sale()
-            };
-
+            _signInManager = signInManager;
         }
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            var list = db.Sales.Where(s=>s.OwnderId == userId).ToList();
+            var user = await _signInManager.UserManager.GetUserAsync(User);
+            var list = db.Sales.Where(s=>s.UserId == user.Id).ToList();
             list.Reverse();
+            
             return View(list);
         }
 
         public IActionResult Create()
         {
-            return View();
+            return View(new SaleViewModel());
         }
 
         //POST Create Action
-        [HttpPost, ActionName("Create")]
+        [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreatePOST()
+        public async Task<IActionResult> Create(SaleViewModel vm)
         {
+            var user = await _signInManager.UserManager.GetUserAsync(User);
+
             if (!ModelState.IsValid)
             {
-                return View(saleViewModel);
+                return View();
             }
-            saleViewModel.Sale.OwnderId = userId;
-            db.Sales.Add(saleViewModel.Sale);
-            await db.SaveChangesAsync();
-
-            var salesFromDb = db.Sales.Find(saleViewModel.Sale.id);
             IFormFileCollection files = HttpContext.Request.Form.Files;
 
             IFormFile formImage = files.FirstOrDefault();
-            salesFromDb.Image = formImage.FormImageToResizedPng(250,250);
-            
+            byte[] image = new byte[0];
+            if (formImage != null)
+            {
+                image = formImage.FormImageToResizedPng(250, 250);
+            }
+            var sale = new Sale()
+            {
+                AfterPrice = vm.AfterPrice,
+                BeforePrice = vm.BeforePrice,
+                Image = image,
+                Name = vm.Name,
+                User = user
+
+        };
+            db.Sales.Add(sale);
+            await db.SaveChangesAsync();
+
             await db.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
@@ -89,12 +92,12 @@ namespace Sale_Dance.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(int id, Sale sale)
+        public IActionResult Edit(int id, SaleViewModel vm)
         {
           
             if (ModelState.IsValid)
             {
-                var saleFromDb = db.Sales.Find(saleViewModel.Sale.id);
+                var saleFromDb = db.Sales.Find(id);
 
                 IFormFileCollection files = HttpContext.Request.Form.Files;
 
@@ -102,18 +105,18 @@ namespace Sale_Dance.Controllers
                 if (formImage != null)
                 {
 
-                    sale.Image = formImage.FormImageToResizedPng(250, 250);
+                    vm.Image = formImage.FormImageToResizedPng(250, 250);
 
                 }
-                saleFromDb.Name = sale.Name;
-                saleFromDb.BeforePrice = sale.BeforePrice;
-                saleFromDb.AfterPrice = sale.AfterPrice;
+                saleFromDb.Name = vm.Name;
+                saleFromDb.BeforePrice = vm.BeforePrice;
+                saleFromDb.AfterPrice = vm.AfterPrice;
                 db.SaveChanges();
                 return RedirectToAction(nameof(Index));
 
             }
 
-            return View(sale);
+            return View(vm);
 
         }
 

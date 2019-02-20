@@ -47,7 +47,7 @@ namespace Sale_Dance.Controllers
 
         public async Task<IActionResult> Create()
         {
-            List<Sale> saleList = db.Sales.Where(s => s.OwnderId == userId).ToList();
+            List<Sale> saleList = db.Sales.Where(s => s.UserId == userId).ToList();
             var salePosts = db.SalePosts.ToList();
             postViewModel.Post = new Post();
             postViewModel.SelectedListItem = saleList.Select(s => new SelectListItem
@@ -83,7 +83,7 @@ namespace Sale_Dance.Controllers
             }
 
             var post = await db.Posts.FindAsync(id);
-            List<Sale> saleList = db.Sales.Where(s=> s.OwnderId == userId).ToList();
+            List<Sale> saleList = db.Sales.Where(s=> s.UserId == userId).ToList();
             var salePosts = db.SalePosts.ToList();
             postViewModel.Post = post;
             postViewModel.SelectedListItem = saleList.Select(s => new SelectListItem {

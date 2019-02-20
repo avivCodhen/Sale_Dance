@@ -37,7 +37,7 @@ namespace Sale_Dance.Services
                     
                     if (!salePostExist)
                     {
-                        db.SalePosts.Add(new SalePosts
+                        db.SalePosts.Add(new SalePost
                         {
                             PostId = postId,
                             SaleId = saleId
