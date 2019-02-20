@@ -7,17 +7,17 @@ using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Sale_Dance.Data;
 
-namespace Sale_Dance.Data.Migrations
+namespace Sale_Dance.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20181108064255_addBodyToPost")]
-    partial class addBodyToPost
+    [Migration("20190220074320_initial")]
+    partial class initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.1.4-rtm-31024")
+                .HasAnnotation("ProductVersion", "2.2.2-servicing-10034")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -63,62 +63,6 @@ namespace Sale_Dance.Data.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("AspNetRoleClaims");
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUser", b =>
-                {
-                    b.Property<string>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<int>("AccessFailedCount");
-
-                    b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken();
-
-                    b.Property<string>("Discriminator")
-                        .IsRequired();
-
-                    b.Property<string>("Email")
-                        .HasMaxLength(256);
-
-                    b.Property<bool>("EmailConfirmed");
-
-                    b.Property<bool>("LockoutEnabled");
-
-                    b.Property<DateTimeOffset?>("LockoutEnd");
-
-                    b.Property<string>("NormalizedEmail")
-                        .HasMaxLength(256);
-
-                    b.Property<string>("NormalizedUserName")
-                        .HasMaxLength(256);
-
-                    b.Property<string>("PasswordHash");
-
-                    b.Property<string>("PhoneNumber");
-
-                    b.Property<bool>("PhoneNumberConfirmed");
-
-                    b.Property<string>("SecurityStamp");
-
-                    b.Property<bool>("TwoFactorEnabled");
-
-                    b.Property<string>("UserName")
-                        .HasMaxLength(256);
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("NormalizedEmail")
-                        .HasName("EmailIndex");
-
-                    b.HasIndex("NormalizedUserName")
-                        .IsUnique()
-                        .HasName("UserNameIndex")
-                        .HasFilter("[NormalizedUserName] IS NOT NULL");
-
-                    b.ToTable("AspNetUsers");
-
-                    b.HasDiscriminator<string>("Discriminator").HasValue("IdentityUser");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
@@ -187,6 +131,94 @@ namespace Sale_Dance.Data.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
+            modelBuilder.Entity("Sale_Dance.Models.ApplicationUser", b =>
+                {
+                    b.Property<string>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int>("AccessFailedCount");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken();
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(256);
+
+                    b.Property<bool>("EmailConfirmed");
+
+                    b.Property<bool>("LockoutEnabled");
+
+                    b.Property<DateTimeOffset?>("LockoutEnd");
+
+                    b.Property<string>("Name");
+
+                    b.Property<string>("NormalizedEmail")
+                        .HasMaxLength(256);
+
+                    b.Property<string>("NormalizedUserName")
+                        .HasMaxLength(256);
+
+                    b.Property<string>("PasswordHash");
+
+                    b.Property<string>("PhoneNumber");
+
+                    b.Property<bool>("PhoneNumberConfirmed");
+
+                    b.Property<string>("SecurityStamp");
+
+                    b.Property<bool>("TwoFactorEnabled");
+
+                    b.Property<string>("UserName")
+                        .HasMaxLength(256);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedEmail")
+                        .HasName("EmailIndex");
+
+                    b.HasIndex("NormalizedUserName")
+                        .IsUnique()
+                        .HasName("UserNameIndex")
+                        .HasFilter("[NormalizedUserName] IS NOT NULL");
+
+                    b.ToTable("AspNetUsers");
+                });
+
+            modelBuilder.Entity("Sale_Dance.Models.Business", b =>
+                {
+                    b.Property<int>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("About");
+
+                    b.Property<string>("Address");
+
+                    b.Property<int>("BusinessEmailContact");
+
+                    b.Property<string>("BusinessOwnerId");
+
+                    b.Property<string>("BusinessPhoneContact");
+
+                    b.Property<string>("Friday");
+
+                    b.Property<string>("Image");
+
+                    b.Property<string>("Name");
+
+                    b.Property<string>("Saturday");
+
+                    b.Property<string>("Site");
+
+                    b.Property<string>("WeekDays");
+
+                    b.HasKey("id");
+
+                    b.HasIndex("BusinessOwnerId");
+
+                    b.ToTable("Businesses");
+                });
+
             modelBuilder.Entity("Sale_Dance.Models.Post", b =>
                 {
                     b.Property<int>("id")
@@ -197,12 +229,20 @@ namespace Sale_Dance.Data.Migrations
                         .IsRequired()
                         .HasMaxLength(500);
 
+                    b.Property<int?>("Businessid");
+
+                    b.Property<bool>("IsPublished");
+
                     b.Property<DateTime>("LastPublished");
 
                     b.Property<string>("Name")
                         .IsRequired();
 
+                    b.Property<string>("OwnerId");
+
                     b.HasKey("id");
+
+                    b.HasIndex("Businessid");
 
                     b.ToTable("Posts");
                 });
@@ -213,9 +253,13 @@ namespace Sale_Dance.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<int>("BusinessId");
+
                     b.Property<int>("PostId");
 
                     b.HasKey("id");
+
+                    b.HasIndex("BusinessId");
 
                     b.HasIndex("PostId");
 
@@ -232,10 +276,12 @@ namespace Sale_Dance.Data.Migrations
 
                     b.Property<double>("BeforePrice");
 
-                    b.Property<string>("Image");
+                    b.Property<byte[]>("Image");
 
                     b.Property<string>("Name")
                         .IsRequired();
+
+                    b.Property<string>("OwnderId");
 
                     b.HasKey("id");
 
@@ -255,17 +301,6 @@ namespace Sale_Dance.Data.Migrations
                     b.ToTable("SalePosts");
                 });
 
-            modelBuilder.Entity("Sale_Dance.Models.ApplicationUser", b =>
-                {
-                    b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityUser");
-
-                    b.Property<string>("Name");
-
-                    b.ToTable("ApplicationUser");
-
-                    b.HasDiscriminator().HasValue("ApplicationUser");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole")
@@ -276,7 +311,7 @@ namespace Sale_Dance.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser")
+                    b.HasOne("Sale_Dance.Models.ApplicationUser")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -284,7 +319,7 @@ namespace Sale_Dance.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser")
+                    b.HasOne("Sale_Dance.Models.ApplicationUser")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -297,7 +332,7 @@ namespace Sale_Dance.Data.Migrations
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser")
+                    b.HasOne("Sale_Dance.Models.ApplicationUser")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -305,14 +340,33 @@ namespace Sale_Dance.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser")
+                    b.HasOne("Sale_Dance.Models.ApplicationUser")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
+            modelBuilder.Entity("Sale_Dance.Models.Business", b =>
+                {
+                    b.HasOne("Sale_Dance.Models.ApplicationUser", "BusinessOwner")
+                        .WithMany()
+                        .HasForeignKey("BusinessOwnerId");
+                });
+
+            modelBuilder.Entity("Sale_Dance.Models.Post", b =>
+                {
+                    b.HasOne("Sale_Dance.Models.Business", "Business")
+                        .WithMany()
+                        .HasForeignKey("Businessid");
+                });
+
             modelBuilder.Entity("Sale_Dance.Models.PublishedPost", b =>
                 {
+                    b.HasOne("Sale_Dance.Models.Business", "Business")
+                        .WithMany()
+                        .HasForeignKey("BusinessId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
                     b.HasOne("Sale_Dance.Models.Post", "Post")
                         .WithMany()
                         .HasForeignKey("PostId")

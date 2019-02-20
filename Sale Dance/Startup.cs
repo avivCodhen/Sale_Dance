@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using Sale_Dance.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Sale_Dance.Models;
 using Sale_Dance.Services;
 using Sale_Dance.Services.Interfaces;
 
@@ -39,12 +40,13 @@ namespace Sale_Dance
             services.AddDbContext<ApplicationDbContext>(options =>
             {
                 options
+                    .UseLazyLoadingProxies()
                 .UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection"));
             }
 
                     );
-            services.AddIdentity<IdentityUser, IdentityRole>()
+            services.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultUI()
                 .AddDefaultTokenProviders();

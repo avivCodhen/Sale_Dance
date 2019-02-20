@@ -12,7 +12,7 @@ namespace Sale_Dance.Models
         public string BusinessOwnerId { get; set; }
 
         [ForeignKey("BusinessOwnerId")]
-        public ApplicationUser BusinessOwner { get; set; }
+        public virtual ApplicationUser BusinessOwner { get; set; }
         public string Name { get; set; }
         public int BusinessEmailContact { get; set; }
         public string Site { get; set; }

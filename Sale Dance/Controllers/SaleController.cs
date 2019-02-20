@@ -65,35 +65,11 @@ namespace Sale_Dance.Controllers
             await db.SaveChangesAsync();
 
             var salesFromDb = db.Sales.Find(saleViewModel.Sale.id);
-            var files = HttpContext.Request.Form.Files;
+            IFormFileCollection files = HttpContext.Request.Form.Files;
 
-
-            //string webRootPath = hostingEnvironment.WebRootPath;
-
-
-            //if (files.Count != 0)
-            //{
-            //    var upload = Path.Combine(webRootPath, SD.ImageFolder);
-            //    var extension = Path.GetExtension(files[0].FileName);
-
-            //    using (var fileStream = new FileStream(Path.Combine(upload, saleViewModel.Sale.id + extension), FileMode.Create))
-            //    {
-            //        files[0].CopyTo(fileStream);
-            //    }
-
-            //    salesFromDb.Image = @"\" + SD.ImageFolder + @"\" + saleViewModel.Sale.id + extension;
-
-            //}
-            //else
-            //{
-            //    var upload = Path.Combine(webRootPath, SD.ImageFolder + @"\" + SD.DefaultProductImage);
-            //    System.IO.File.Copy(upload, webRootPath + @"\" + SD.ImageFolder + @"\" + saleViewModel.Sale.id + "jpg");
-            //    salesFromDb.Image = @"\" + SD.ImageFolder + @"\" + saleViewModel.Sale.id + "jpg";
-
-            //}
-
-            salesFromDb.Image = SaveImageHelper.CopyFilesToFolder(hostingEnvironment,files, salesFromDb.id);
-
+            IFormFile formImage = files.FirstOrDefault();
+            salesFromDb.Image = formImage.FormImageToResizedPng(250,250);
+            
             await db.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
@@ -118,13 +94,16 @@ namespace Sale_Dance.Controllers
           
             if (ModelState.IsValid)
             {
-                var saleFromDb = db.Sales.Find(id);
-                var files = HttpContext.Request.Form.Files;
-                if(files.Count != 0)
+                var saleFromDb = db.Sales.Find(saleViewModel.Sale.id);
+
+                IFormFileCollection files = HttpContext.Request.Form.Files;
+
+                IFormFile formImage = files.FirstOrDefault();
+                if (formImage != null)
                 {
 
-                    sale.Image = SaveImageHelper.ReplaceFiles(hostingEnvironment, files, saleFromDb.Image, id);
-                    
+                    sale.Image = formImage.FormImageToResizedPng(250, 250);
+
                 }
                 saleFromDb.Name = sale.Name;
                 saleFromDb.BeforePrice = sale.BeforePrice;

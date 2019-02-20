@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Sale_Dance.Models;
 
 namespace Sale_Dance.Data
 {
-    public class ApplicationDbContext : IdentityDbContext
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
@@ -16,7 +17,6 @@ namespace Sale_Dance.Data
 
         protected override  void OnModelCreating(ModelBuilder modelBuilder)
         {
-            base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<SalePosts>()
                 .HasKey(t => new { t.SaleId, t.PostId });
@@ -31,6 +31,7 @@ namespace Sale_Dance.Data
                .WithMany(x => x.Posts)
                .HasForeignKey(y => y.SaleId);
 
+            base.OnModelCreating(modelBuilder);
 
         }
 

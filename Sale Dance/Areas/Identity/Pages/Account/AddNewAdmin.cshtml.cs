@@ -13,12 +13,12 @@ namespace Sale_Dance.Areas.Identity.Pages.Account
     public class AddNewAdminModel : PageModel
     {
 
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> roleManager;
 
 
         public AddNewAdminModel(
-            UserManager<IdentityUser> userManager,
+            UserManager<ApplicationUser> userManager,
             RoleManager<IdentityRole> roleManager)
         {
             _userManager = userManager;

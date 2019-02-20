@@ -12,6 +12,7 @@ using Sale_Dance.Data;
 using Sale_Dance.Models;
 using Sale_Dance.Models.ViewModel;
 using Sale_Dance.Services;
+using Sale_Dance.Soldiers;
 using Sale_Dance.Utility;
 
 namespace Sale_Dance.Controllers
@@ -71,7 +72,7 @@ namespace Sale_Dance.Controllers
                 await db.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(post);
+            return View();
         }
 
         public async Task<IActionResult> Edit(int? id)

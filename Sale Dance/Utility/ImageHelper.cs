@@ -5,11 +5,15 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Mime;
 using System.Threading.Tasks;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
+using SixLabors.ImageSharp.Processing;
 
 namespace Sale_Dance.Utility
 {
-    public class SaveImageHelper
+    public static class ImageHelper
     {
 
         public const string DefaultProductImage = "default_product.jpg";
@@ -49,6 +53,16 @@ namespace Sale_Dance.Utility
             return CopyFilesToFolder(hosting, files, id);
         }
 
+       public static byte[] FormImageToResizedPng(this IFormFile formImage, int width, int height)
+       {
+           using (Image<Rgba32> image = Image.Load(formImage.OpenReadStream()))
+           using (MemoryStream memoryStream = new MemoryStream())
+           {
+               image.Mutate(x => x.Resize(width, height));
+               image.SaveAsPng(memoryStream);
+               return memoryStream.ToArray();
+           }
+       }
 
     }
 }
