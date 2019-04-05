@@ -23,39 +23,7 @@ namespace Sale_Dance.Services
 
         public void UpdateSalePost(PostViewModel postViewModel)
         {
-            foreach (var item in postViewModel.SelectedListItem)
-            {
-                var postId = postViewModel.Post.id;
-                var saleId = Int32.Parse(item.Value);
-                var salePostExist = db.SalePosts.
-                    Any(sp => (sp.PostId == postViewModel.Post.id)
-                    && (sp.SaleId == Int32.Parse(item.Value)));
-
-                if (item.Selected == true)
-                {
-
-                    
-                    if (!salePostExist)
-                    {
-                        db.SalePosts.Add(new SalePost
-                        {
-                            PostId = postId,
-                            SaleId = saleId
-                        });
-                    }
-
-                }
-                else
-                {
-                    if (salePostExist)
-                    {
-                       var salePost =  db.SalePosts.SingleOrDefault(sp => (sp.SaleId == saleId)&&(sp.PostId == postId));
-
-                        db.SalePosts.Remove(salePost);
-                    }
-                }
-            }
-
+            
             db.SaveChanges();
         }
     }

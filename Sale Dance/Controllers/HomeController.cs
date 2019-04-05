@@ -6,6 +6,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Sale_Dance.Data;
@@ -14,64 +15,99 @@ using Sale_Dance.Models.ViewModel;
 using Sale_Dance.Services;
 using Sale_Dance.Soldiers;
 using Sale_Dance.Utility;
+using Sale_Dance.Utility.Attributes;
 
 namespace Sale_Dance.Controllers
 {
     [Authorize()]
     public class HomeController : Controller
     {
+        private readonly ApplicationDbContext _db;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        private readonly ApplicationDbContext db;
-        private readonly IHttpContextAccessor httpContext;
-        private string userId;
-        private PostViewModel postViewModel;
-        private readonly ISalePostService salePostService;
-
-        public HomeController(ApplicationDbContext db,
-            IHttpContextAccessor httpContext,
-            ISalePostService salePostService)
+        public HomeController(ApplicationDbContext db, UserManager<ApplicationUser> userManager)
         {
-
-            this.db = db;
-            this.httpContext = httpContext;
-            userId = httpContext.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            postViewModel = new PostViewModel();
-            this.salePostService = salePostService;
+            this._db = db;
+            _userManager = userManager;
         }
-        public IActionResult Index()
+
+        public async Task<IActionResult> Index()
         {
-            var list = db.Posts.Where(p => p.OwnerId == userId).ToList();
+            var user = await _userManager.GetUserAsync(User);
+            var list = _db.Posts.Where(p => p.UserId == user.Id).ToList();
             list.Reverse();
-            return View(list);
+            return View(new HomeIndexViewModel()
+            {
+                Posts = list,
+                ShowHelpfulSaleCard = !user.DontShowHelpfulSaleAlert
+
+            });
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Index(int id, PostAction postAction)
+        {
+            if (postAction == PostAction.Publish)
+            {
+                await PublishPost(id);
+            }
+            else if (postAction == PostAction.Unpublish)
+            {
+                await UnPublishPost(id);
+            }
+            else if (postAction == PostAction.Bump)
+            {
+                BumpPost(id);
+            }
+            var user = await _userManager.GetUserAsync(User);
+            var list = _db.Posts.Where(p => p.UserId == user.Id).ToList();
+            list.Reverse();
+            return View(new HomeIndexViewModel()
+            {
+                Posts = list,
+                ShowHelpfulSaleCard = !user.DontShowHelpfulSaleAlert
+
+            });
+        }
+
 
         public async Task<IActionResult> Create()
         {
-            List<Sale> saleList = db.Sales.Where(s => s.UserId == userId).ToList();
-            var salePosts = db.SalePosts.ToList();
-            postViewModel.Post = new Post();
-            postViewModel.SelectedListItem = saleList.Select(s => new SelectListItem
+            var user = await _userManager.GetUserAsync(User);
+
+            List<Sale> saleList = _db.Sales.Where(s => s.UserId == user.Id).ToList();
+            var vm = new PostViewModel()
             {
-                Text = s.Name,
-                Value = s.id.ToString(),
-                Selected = false
-            }).ToList();
-            return View(postViewModel);
+                SelectedListItem = saleList.Select(s => new SelectListItem
+                {
+                    Text = s.Name,
+                    Value = s.Id.ToString()
+                }).ToList(),
+            };
+            return View(vm);
         }
 
         //POST Create Action
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Post post)
+        public async Task<IActionResult> Create(PostViewModel vm)
         {
+            var user = await _userManager.GetUserAsync(User);
             if (ModelState.IsValid)
             {
-                post.OwnerId = userId;
-                
-                db.Add(post);
-                await db.SaveChangesAsync();
+                var post = new Post()
+                {
+                    User = user,
+                    Name = vm.Name,
+                    Body = vm.Body,
+                };
+
+                _db.Add(post);
+                await _db.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+
             return View();
         }
 
@@ -82,43 +118,77 @@ namespace Sale_Dance.Controllers
                 return NotFound();
             }
 
-            var post = await db.Posts.FindAsync(id);
-            List<Sale> saleList = db.Sales.Where(s=> s.UserId == userId).ToList();
-            var salePosts = db.SalePosts.ToList();
-            postViewModel.Post = post;
-            postViewModel.SelectedListItem = saleList.Select(s => new SelectListItem {
-                Text = s.Name,
-                Value = s.id.ToString(),
-                Selected = salePosts.Any(salePost=> salePost.SaleId == s.id)
-            }).ToList();
+            var user = await _userManager.GetUserAsync(User);
 
-            if (post == null)
+            var post = _db.Posts.SingleOrDefault(x => x.Id == id);
+            List<Sale> saleList = _db.Sales.Where(s => s.UserId == user.Id).ToList();
+            var salePosts = _db.SalePosts.ToList();
+            var vm = new PostViewModel()
             {
-                return NotFound();
-            }
-            return View(postViewModel);
+                SelectedListItem = saleList.Select(s => new SelectListItem
+                {
+                    Text = s.Name,
+                    Value = s.Id.ToString()
+                }).ToList(),
+                ListOfSales = post.SalePosts.Select(x => x.Sale).ToList(),
+                Body = post.Body,
+                Name = post.Name,
+                Id = post.Id
+            };
+            return View(vm);
         }
-
 
         //POST Edit Action
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, PostViewModel pvm)
         {
-            if(id != pvm.Post.id)
+            if (id != pvm.Id)
             {
                 return NotFound();
             }
-            if (ModelState.IsValid)
-            { 
 
-                salePostService.UpdateSalePost(pvm);
-                pvm.Post.OwnerId = userId;
-                db.Update(pvm.Post);
-                await db.SaveChangesAsync();
+            if (ModelState.IsValid)
+            {
+                var postFromDb = _db.Posts.SingleOrDefault(x => x.Id == id);
+                postFromDb.Body = pvm.Body;
+                postFromDb.Name = pvm.Name;
+                postFromDb.LastEdited = DateTime.Now;
+                await _db.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(pvm.Post);
+
+            return View(pvm);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddSaleToPost([FromBody] SalePostForm s)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            var post = _db.Posts.Single(x => x.Id == s.PostId);
+            if (post.SalePosts.Any(x => x.SaleId == s.SaleId)) return BadRequest();
+            {
+                var sale = _db.Sales.Single(x => x.Id == s.SaleId);
+                post.SalePosts.Add(new SalePost() {Post = post, Sale = sale});
+                await _db.SaveChangesAsync();
+                return PartialView("Sale/_SaleItemPartial",
+                    new SaleItemPartialViewModel() {Name = sale.Name, Id = sale.Id});
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RemoveSaleFromPost([FromBody] SalePostForm s)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            var post = _db.Posts.Single(x => x.Id == s.PostId);
+            if (post.SalePosts.All(x => x.SaleId != s.SaleId)) return BadRequest();
+            {
+                var salePost = _db.SalePosts.Single(x => x.SaleId == s.SaleId && x.PostId == s.PostId);
+                post.SalePosts.Remove(salePost);
+                await _db.SaveChangesAsync();
+                return Ok();
+            }
         }
 
         public async Task<IActionResult> Details(int? id)
@@ -128,32 +198,15 @@ namespace Sale_Dance.Controllers
                 return NotFound();
             }
 
-            var posts = await db.Posts.FindAsync(id);
+            var posts = await _db.Posts.FindAsync(id);
             if (posts == null)
             {
                 return NotFound();
             }
+
             return View(posts);
         }
 
-
-        //POST Details Action
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Details(int id, Post post)
-        {
-            if (id != post.id)
-            {
-                return NotFound();
-            }
-            if (ModelState.IsValid)
-            {
-                db.Update(post);
-                await db.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(post);
-        }
 
         public async Task<IActionResult> Delete(int? id)
         {
@@ -162,17 +215,15 @@ namespace Sale_Dance.Controllers
                 return NotFound();
             }
 
-            var post = await db.Posts.FindAsync(id);
+            var post = await _db.Posts.FindAsync(id);
 
 
-            
             if (post == null)
             {
                 return NotFound();
             }
 
             return View(post);
-
         }
 
         //POST Delete Action
@@ -180,20 +231,17 @@ namespace Sale_Dance.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
         {
+            var posts = await _db.Posts.FindAsync(id);
 
-            var posts = await db.Posts.FindAsync(id);
-
-            db.Posts.Remove(posts);
-            await db.SaveChangesAsync();
+            _db.Posts.Remove(posts);
+            await _db.SaveChangesAsync();
 
             return RedirectToAction(nameof(Index));
-
         }
 
 
         public IActionResult About()
         {
-
             return View();
         }
 
@@ -212,93 +260,94 @@ namespace Sale_Dance.Controllers
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            return View(new ErrorViewModel {RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier});
         }
 
         public IActionResult Publish(int? id)
         {
-
-            if(id == null)
+            if (id == null)
             {
                 return NotFound();
             }
 
-            var postFromDb = db.Posts.Find(id);
-            var postList = db.Posts.Where(p => p.OwnerId == userId).ToList();
-            if(postFromDb == null)
-            {
-                return NotFound();
-            }
-            var results = Publisher.ValidToPost(postList, postFromDb);
+            return RedirectToAction(nameof(Index));
+        }
+
+      
+        private async Task PublishPost(int id)
+        {
+
+            var user = await _userManager.GetUserAsync(User);
+
+            var postFromDb = _db.Posts.Single(x=>x.Id == id);
+            
+
+
+            var postList = _db.Posts.Where(p => p.UserId == user.Id).ToList();
+            var b = _db.Businesses.Single(x => x.UserId == user.Id);
+
+            var results = Publisher.ValidToPost(postList, postFromDb, b);
             if (results.Item1 == true)
             {
                 var publishedPost = new PublishedPost
                 {
-                    PostId = postFromDb.id
+                    Post = postFromDb,
+                    Business = b
                 };
                 postFromDb.IsPublished = true;
-                var business = db.Businesses.Where(b => b.BusinessOwnerId == userId).SingleOrDefault();
-                publishedPost.BusinessId = business.id;
-                db.PublishedPosts.Add(publishedPost);
-                db.SaveChanges();
-                TempData["PublishSuccess"] = results.Item2;
+                _db.PublishedPosts.Add(publishedPost);
+                await _db.SaveChangesAsync();
+                ViewData["PublishSuccess"] = results.Item2;
             }
             else
             {
-                TempData["PublishAlert"] = results.Item2;
-
+                ViewData["PublishAlert"] = results.Item2;
             }
-
-            return RedirectToAction(nameof(Index));
-
         }
 
-        public IActionResult Unpublish(int? id)
+        private async Task UnPublishPost(int id)
         {
-            if(id == null)
-            {
-                return NotFound();
-            }
-
-            var postFromDb = db.Posts.Find(id);
+            var postFromDb = _db.Posts.Single(x => x.Id == id);
             postFromDb.IsPublished = false;
-            var publishedPostFromDb = db.PublishedPosts.Where(p=>p.PostId == id).SingleOrDefault();
-            if(publishedPostFromDb != null)
+            var publishedPostFromDb = _db.PublishedPosts.SingleOrDefault(p => p.PostId == id);
+            if (publishedPostFromDb != null)
             {
-                db.Remove(publishedPostFromDb);
-                db.SaveChanges();
-                TempData["UnpublishAlert"] = "הפוסט הוסר מהפירסום בהצלחה!";
+                _db.Remove(publishedPostFromDb);
+                await _db.SaveChangesAsync();
+                ViewData["UnpublishAlert"] = "הפוסט הוסר מהפירסום בהצלחה!";
             }
             else
             {
-                TempData["PublishError"] = "התרחשה שגיאת בעת הסרת הפוסט.";
+                ViewData["PublishError"] = "התרחשה שגיאת בעת הסרת הפוסט.";
             }
-
-            return RedirectToAction(nameof(Index));
-            //var db.PublishedPosts.Where(p => p.PostId == id);
         }
 
-        public IActionResult Bump(int? id)
+        private void BumpPost(int id)
         {
-            if( id == null)
-            {
-                return NotFound();
-            }
-            var publishedPostFromDb = db.PublishedPosts.Where(p => p.PostId == id).SingleOrDefault();
+            var publishedPostFromDb = _db.PublishedPosts.Single(p => p.PostId == id);
             var results = Bumper.ValidToBump(publishedPostFromDb);
 
             if (results.Item1 == true)
             {
                 publishedPostFromDb.PublishTime = DateTime.Now;
-                db.SaveChanges();
-                TempData["PublishSuccess"] = results.Item2;
+                _db.SaveChanges();
+                ViewData["PublishSuccess"] = results.Item2;
             }
             else
             {
-                TempData["PublishAlert"] = results.Item2;
-
+                ViewData["BumpAlert"] = results.Item2;
             }
-            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DontShowSaleHelpfulAlert()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            var userFromDb = _db.Users.Single(x => x.Id == user.Id);
+            userFromDb.DontShowHelpfulSaleAlert = true;
+            await _db.SaveChangesAsync();
+            return Ok();
         }
     }
 }

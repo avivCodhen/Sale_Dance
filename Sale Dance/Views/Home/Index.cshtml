@@ -1,5 +1,5 @@
-﻿@model IEnumerable<Sale_Dance.Models.Post>
-
+﻿@using Sale_Dance.Utility
+@model Sale_Dance.Models.ViewModel.HomeIndexViewModel
 @{
     ViewData["Title"] = "בית";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -11,22 +11,36 @@
 <div dir="rtl" class="text-right">
 
 
-    @if (TempData["PublishAlert"] != null)
+    @if (ViewData["PublishAlert"] != null)
     {
-        <div class="alert alert-danger"> @TempData["PublishAlert"]</div>
+    <div class="alert alert-danger"> @ViewData["PublishAlert"]</div>
     }
 
-    @if (TempData["PublishSuccess"] != null)
+    @if (ViewData["PublishSuccess"] != null)
     {
-        <div class="alert alert-success"> @TempData["PublishSuccess"]</div>
+    <div class="alert alert-success"> @ViewData["PublishSuccess"]</div>
     }
 
 
-    @if (TempData["UnpublishAlert"] != null)
+    @if (ViewData["UnpublishAlert"] != null)
     {
-        <div class="alert alert-success"> @TempData["UnpublishAlert"]</div>
+    <div class="alert alert-success"> @ViewData["UnpublishAlert"]</div>
     }
-
+    
+    @if (Model.ShowHelpfulSaleCard)
+    {
+        <div class="row">
+       
+            <div class="  mb-4 col-8 alert alert-dismissible text-white  fade show" role="alert" style="background-color: #d71c4d;">
+                <h5>איך מוסיפים מבצע לפוסט</h5>
+                <p style="margin: 0; font-size: 14px"> לאחר שיצרת פוסט חדש בלחיצה על "פוסט חדש", תוכל להוסיף לו מבצע על ידי עריכתו, בלחיצה על "עריכה" בשורה של הפוסט ברשימה למטה. </p>
+                <button id="closeHelpfulSaleCard" class="mt-3 btn " style="background: white; color: #d71c4d;" aria-label="Close">
+                    אל תראה חלון זה יותר
+                </button>
+            </div>
+        </div>
+    }
+    
     <div class="row">
 
         <div class="col-6">
@@ -44,30 +58,68 @@
     <br />
 
     <table class="table table-striped border">
+        <thead class="table-info">
+        <tr class="">
 
-        <tr class="table-info ">
-
-            <th>
+            <th scope="col">
                 שם
             </th>
-            <th></th>
+            <th scope="col">נערך לאחרונה</th>
+            <th scope="col">נוצר</th>
+            <th scope="col">מבצעים</th>
         </tr>
-
-        @foreach (var item in Model)
+        </thead>
+        @foreach (var item in Model.Posts)
         {
-            <tr>
+            <tbody>
 
-                <td class="align-middle">
+            <tr>
+                <td >
                     @Html.DisplayFor(m => item.Name)
                 </td>
-
+               
+                <td>@item.LastEdited?.DateWithTime()</td>
+                <td>@item.Created.DateWithTime()</td>
+                <td>@item.SalePosts.Count 
+                
+                    <a asp-controller="Home" asp-action="Edit" asp-route-id="@item.Id">צפה</a>
+                </td>
                 <td>
 
-                    <partial name="_PostsTableButtonPartial" model="item" />
+                    <partial name="_PostsTableButtonPartial" model="item"/>
                 </td>
-
             </tr>
+            </tbody>
+
         }
     </table>
 
 </div>
+
+@section Scripts
+{
+    <script>
+        $(function() {
+            $("#closeHelpfulSaleCard").on('click',
+                function() {
+                    $.ajax({
+                        url:'@Url.Action("DontShowSaleHelpfulAlert","Home")',        
+                        type: 'POST',   
+                        headers: {
+                            RequestVerificationToken: 
+                                $('input:hidden[name="__RequestVerificationToken"]').val()
+                        },
+                        processData: true,
+                        contentType: "application/json; charset=utf-8",
+                        success: function (data) {
+                            $(this).closest(".alert").alert('close');
+                        }.bind(this),
+                        error: function (XMLHttpRequest, textStatus, errorThrown) {
+                            $(".fa-spinner").hide();
+
+                        }
+                    });
+                });
+        });
+    </script>
+}

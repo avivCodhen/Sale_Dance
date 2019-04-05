@@ -1,4 +1,5 @@
-﻿@model Sale_Dance.Models.ViewModel.PostViewModel
+﻿@using Sale_Dance.Models.ViewModel
+@model Sale_Dance.Models.ViewModel.PostViewModel
 @{
     ViewData["Title"] = "Edit";
 }
@@ -8,10 +9,10 @@
 <h2 class="text-info">ערוך פוסט</h2>
 
 <form method="post" asp-action="Edit">
-    <input type="hidden" asp-for="Post.id" />
+    <input type="hidden" asp-for="@Model.Id" />
     <div class="p-4 border rounded">
 
-        <div asp-validation-summary"ModelOnly" class="text-danger"></div>
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
         <div class="form-group row">
 
             <div class="col-2">
@@ -19,7 +20,7 @@
                 <label> שם</label>
             </div>
             <div class="col-5">
-                <input asp-for="Post.Name" class="form-control" />
+                <input asp-for="Name" class="form-control" />
             </div>
         </div>
         <div class="form-group row">
@@ -29,9 +30,9 @@
                 <label>תוכן הפוסט</label>
             </div>
             <div class="col-5">
-                <textarea asp-for="Post.Body" row="4" class="form-control"></textarea>
+                <textarea asp-for="Body" row="4" class="form-control"></textarea>
             </div>
-            <span asp-validation-for="Post.Body" class="text-danger"></span>
+            <span asp-validation-for="Body" class="text-danger"></span>
         </div>
 
 
@@ -40,24 +41,31 @@
         <br />
 
 
-        <table>
+        <div class="row">
+            <label class="m-0 ml-3">בחר מבצע</label>
+            <select id="saleSelect" asp-items="@Model.SelectedListItem">
+                <option>-</option>
+            </select>
+        </div>
+          
 
-            @for (var i = 0; i < Model.SelectedListItem.Capacity; i++)
-            {
-                <tr>
+        <br />
+        <div class="row">
+            <h4 class="ml-3 text-info">מבצעים המשוייכים לפוסט</h4>
+            <i class="fas fa-spinner fa-spin" style="display: none;"></i>
+        </div>
+        <br/>   
+        <div class="row">
+            <p class="text-success w-100" id="savedSaleListChanges"style="display:none">נשמר בהצלחה</p>
+            <div class="row no-gutters list-sales-div" >
 
-                    <td>
+                @foreach (var item in Model.ListOfSales)
+                {
+                    <partial name="Sale/_SaleItemPartial" model="@(new SaleItemPartialViewModel() {Name = item.Name, Id = item.Id})" />
+                }
+            </div>
 
-                        @Html.HiddenFor(x => Model.SelectedListItem[i].Value)
-                        @Html.DisplayFor(t => Model.SelectedListItem[i].Text)
-                    </td>
-                    <td>
-                        @Html.CheckBoxFor(t => Model.SelectedListItem[i].Selected)
-                    </td>
-                </tr>
-            }
-        </table>
-
+            </div>
 
     </div>
 
@@ -65,11 +73,10 @@
 
         <div class="form-group text-left">
 
-            <input type="submit" class="btn btn-primary" asp-route-id="@Model.Post.id" value="שמור שינויים" />
+            <input type="submit" class="btn btn-primary" asp-route-id="@Model.Id" value="שמור שינויים" />
             <a asp-action="Index" class="btn btn-success">חזרה לפוסטים</a>
 
         </div>
-    </div>
 </form>
 
 @section Scripts{
@@ -77,4 +84,67 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+    
+     
+    <script>
+
+        $("#saleSelect").change(
+            function () {
+                $(".fa-spinner").show();
+                var data = JSON.stringify({postId: @Model.Id,saleId: $(this).val()});
+                $.ajax({
+                    url:'@Url.Action("AddSaleToPost","Home")',            
+                    data: data,                
+                    type: 'POST',   
+                    headers: {
+                        RequestVerificationToken: 
+                            $('input:hidden[name="__RequestVerificationToken"]').val()
+                    },
+                    processData: true,
+                    contentType: "application/json; charset=utf-8",
+                    success: function (data) {
+                        $(".list-sales-div").append(data);
+                        $("#savedSaleListChanges").show();
+                        $(".fa-spinner").hide();
+
+
+                    },
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        $(".fa-spinner").hide();
+
+                    }
+                });
+
+            });
+
+        $(".saleItemDiv").on('click',
+            function () {
+                $(".fa-spinner").show();
+
+                var data = JSON.stringify({postId: @Model.Id,saleId: $(this).data("id")});
+                $.ajax({
+                    url:'@Url.Action("RemoveSaleFromPost", "Home")',            
+                    data: data,                
+                    type: 'POST',   
+                    headers: {
+                        RequestVerificationToken: 
+                            $('input:hidden[name="__RequestVerificationToken"]').val()
+                    },
+                    processData: true,
+                    contentType: "application/json; charset=utf-8",
+                    success: function (data) {
+                        $(this).parent().remove();
+                        $("#savedSaleListChanges").show();
+                        $(".fa-spinner").hide();
+
+
+                    }.bind(this),
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        $(".fa-spinner").hide();
+
+                    }
+                });
+
+            });
+    </script>
 }

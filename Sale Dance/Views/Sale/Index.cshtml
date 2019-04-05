@@ -1,4 +1,5 @@
-﻿@model IEnumerable<Sale_Dance.Models.Sale>
+﻿@using Sale_Dance.Utility
+@model IEnumerable<Sale_Dance.Models.Sale>
 
 @{
     ViewData["Title"] = "מבצעים";
@@ -27,29 +28,40 @@
 
         <tr class="table-info ">
 
-            <th>
+            <th >
                 שם
             </th>
             <th>
                 מחיר לפני
             </th>
-            <th>
+            <th >
                 מחיר אחרי
             </th>
-            <th></th>
-            <th></th>
+            <th >נערך לאחרונה</th>
+            <th>נוצר</th>
         </tr>
 
         @foreach (var item in Model)
         {
             <tr>
-
-                <td class="align-middle">
+                <td >
                     @Html.DisplayFor(m => item.Name)
                 </td>
-
                 <td>
+                    @Html.DisplayFor(m => item.BeforePrice)
 
+                </td>
+                
+                <td>
+                    @Html.DisplayFor(m => item.SalePrice)
+                </td>
+               
+                <td>@item.LastEdited?.DateWithTime()</td>
+                <td>@item.Created.DateWithTime()</td>
+                
+               
+                
+                <td>
                     <partial name="_SalesTableButtonsPartialView" model="item" />
                 </td>
 

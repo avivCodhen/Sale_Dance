@@ -1,4 +1,5 @@
-﻿@model  Sale_Dance.Models.ViewModel.PostViewModel
+﻿@using Sale_Dance.Models.ViewModel
+@model  Sale_Dance.Models.ViewModel.PostViewModel
 @{
     ViewData["Title"] = "Create";
 }
@@ -19,9 +20,9 @@
                 <label> כותרת</label>
             </div>
             <div class="col-5">
-                <input asp-for="@Model.Post.Name" class="form-control" />
+                <input asp-for="@Model.Name" class="form-control" />
             </div>
-            <span asp-validation-for="@Model.Post.Name" class="text-danger"></span>
+            <span asp-validation-for="@Model.Name" class="text-danger"></span>
 
         </div>
 
@@ -32,36 +33,17 @@
                 <label> תוכן הפוסט</label>
             </div>
             <div class="col-5">
-                <textarea asp-for="@Model.Post.Body" class="form-control" rows="4"></textarea>
+                <textarea asp-for="@Model.Body" class="form-control" rows="4"></textarea>
             </div>
-            <span asp-validation-for="@Model.Post.Body" class="text-danger"></span>
+            <span asp-validation-for="@Model.Body" class="text-danger"></span>
 
           
         </div>
-          <br />
-            <h4>הוסף מבצעים לפוסט</h4>
-            <br />
-
-
-            <table>
-
-                @for (var i = 0; i < Model.SelectedListItem.Capacity; i++)
-                {
-                    <tr>
-
-                        <td>
-
-                            @Html.HiddenFor(x => Model.SelectedListItem[i].Value)
-                            @Html.DisplayFor(t => Model.SelectedListItem[i].Text)
-                        </td>
-                        <td>
-                            @Html.CheckBoxFor(t => Model.SelectedListItem[i].Selected)
-                        </td>
-                    </tr>
-                }
-            </table>
-
-        <br />
+         
+        <div class="d-block row">
+            <h3>הוספת מבצעים לפוסט</h3>
+            <p class="text-danger">כדי להוסיף מבצעים עלייך קודם ליצור את הפוסט. בעריכה, תוכל להוסיף מבצעים.</p>
+            </div>
 
         <div class="form-group text-left">
 
@@ -78,5 +60,7 @@
 
     @{ 
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
+
     }
+   
 }

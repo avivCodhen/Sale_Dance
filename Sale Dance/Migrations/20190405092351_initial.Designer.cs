@@ -10,14 +10,14 @@ using Sale_Dance.Data;
 namespace Sale_Dance.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20190220110856_asd")]
-    partial class asd
+    [Migration("20190405092351_initial")]
+    partial class initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.2.2-servicing-10034")
+                .HasAnnotation("ProductVersion", "2.2.3-servicing-35854")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -141,6 +141,8 @@ namespace Sale_Dance.Migrations
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken();
 
+                    b.Property<bool>("DontShowHelpfulSaleAlert");
+
                     b.Property<string>("Email")
                         .HasMaxLength(256);
 
@@ -186,7 +188,7 @@ namespace Sale_Dance.Migrations
 
             modelBuilder.Entity("Sale_Dance.Models.Business", b =>
                 {
-                    b.Property<int>("id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -194,15 +196,13 @@ namespace Sale_Dance.Migrations
 
                     b.Property<string>("Address");
 
-                    b.Property<int>("BusinessEmailContact");
-
-                    b.Property<string>("BusinessOwnerId");
+                    b.Property<string>("BusinessEmailContact");
 
                     b.Property<string>("BusinessPhoneContact");
 
                     b.Property<string>("Friday");
 
-                    b.Property<string>("Image");
+                    b.Property<int?>("ImageId");
 
                     b.Property<string>("Name");
 
@@ -210,46 +210,62 @@ namespace Sale_Dance.Migrations
 
                     b.Property<string>("Site");
 
+                    b.Property<string>("UserId");
+
                     b.Property<string>("WeekDays");
 
-                    b.HasKey("id");
+                    b.HasKey("Id");
 
-                    b.HasIndex("BusinessOwnerId");
+                    b.HasIndex("ImageId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Businesses");
                 });
 
-            modelBuilder.Entity("Sale_Dance.Models.Post", b =>
+            modelBuilder.Entity("Sale_Dance.Models.Image", b =>
                 {
-                    b.Property<int>("id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("Body")
-                        .IsRequired()
-                        .HasMaxLength(500);
+                    b.Property<byte[]>("Bytes");
 
-                    b.Property<int?>("Businessid");
+                    b.Property<int>("SaleId");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Images");
+                });
+
+            modelBuilder.Entity("Sale_Dance.Models.Post", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Body");
 
                     b.Property<bool>("IsPublished");
 
+                    b.Property<DateTime?>("LastEdited");
+
                     b.Property<DateTime>("LastPublished");
 
-                    b.Property<string>("Name")
-                        .IsRequired();
+                    b.Property<string>("Name");
 
-                    b.Property<string>("OwnerId");
+                    b.Property<string>("UserId");
 
-                    b.HasKey("id");
+                    b.HasKey("Id");
 
-                    b.HasIndex("Businessid");
+                    b.HasIndex("UserId");
 
                     b.ToTable("Posts");
                 });
 
             modelBuilder.Entity("Sale_Dance.Models.PublishedPost", b =>
                 {
-                    b.Property<int>("id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -257,7 +273,7 @@ namespace Sale_Dance.Migrations
 
                     b.Property<int>("PostId");
 
-                    b.HasKey("id");
+                    b.HasKey("Id");
 
                     b.HasIndex("BusinessId");
 
@@ -268,21 +284,27 @@ namespace Sale_Dance.Migrations
 
             modelBuilder.Entity("Sale_Dance.Models.Sale", b =>
                 {
-                    b.Property<int>("id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<double>("AfterPrice");
-
                     b.Property<double>("BeforePrice");
 
-                    b.Property<byte[]>("Image");
+                    b.Property<string>("Description");
+
+                    b.Property<int?>("ImageId");
+
+                    b.Property<DateTime?>("LastEdited");
 
                     b.Property<string>("Name");
 
+                    b.Property<double>("SalePrice");
+
                     b.Property<string>("UserId");
 
-                    b.HasKey("id");
+                    b.HasKey("Id");
+
+                    b.HasIndex("ImageId");
 
                     b.HasIndex("UserId");
 
@@ -349,16 +371,20 @@ namespace Sale_Dance.Migrations
 
             modelBuilder.Entity("Sale_Dance.Models.Business", b =>
                 {
-                    b.HasOne("Sale_Dance.Models.ApplicationUser", "BusinessOwner")
+                    b.HasOne("Sale_Dance.Models.Image", "Image")
                         .WithMany()
-                        .HasForeignKey("BusinessOwnerId");
+                        .HasForeignKey("ImageId");
+
+                    b.HasOne("Sale_Dance.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
                 });
 
             modelBuilder.Entity("Sale_Dance.Models.Post", b =>
                 {
-                    b.HasOne("Sale_Dance.Models.Business", "Business")
+                    b.HasOne("Sale_Dance.Models.ApplicationUser", "User")
                         .WithMany()
-                        .HasForeignKey("Businessid");
+                        .HasForeignKey("UserId");
                 });
 
             modelBuilder.Entity("Sale_Dance.Models.PublishedPost", b =>
@@ -376,6 +402,10 @@ namespace Sale_Dance.Migrations
 
             modelBuilder.Entity("Sale_Dance.Models.Sale", b =>
                 {
+                    b.HasOne("Sale_Dance.Models.Image", "Image")
+                        .WithMany()
+                        .HasForeignKey("ImageId");
+
                     b.HasOne("Sale_Dance.Models.ApplicationUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId");
@@ -384,7 +414,7 @@ namespace Sale_Dance.Migrations
             modelBuilder.Entity("Sale_Dance.Models.SalePost", b =>
                 {
                     b.HasOne("Sale_Dance.Models.Post", "Post")
-                        .WithMany("Sales")
+                        .WithMany("SalePosts")
                         .HasForeignKey("PostId")
                         .OnDelete(DeleteBehavior.Cascade);
 

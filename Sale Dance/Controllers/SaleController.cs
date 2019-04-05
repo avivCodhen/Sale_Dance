@@ -57,19 +57,25 @@ namespace Sale_Dance.Controllers
 
             IFormFile formImage = files.FirstOrDefault();
             byte[] image = new byte[0];
-            if (formImage != null)
-            {
-                image = formImage.FormImageToResizedPng(250, 250);
-            }
+            
             var sale = new Sale()
             {
-                AfterPrice = vm.AfterPrice,
+                SalePrice = vm.SalePrice,
                 BeforePrice = vm.BeforePrice,
-                Image = image,
+               
                 Name = vm.Name,
-                User = user
+                User = user,
+                Description = vm.Description
 
         };
+            if (formImage != null)
+            {
+                image = formImage.FormImageToResizedPng(400, 400);
+                sale.Image = new Image()
+                {
+                    Bytes = image,
+                };
+            }
             db.Sales.Add(sale);
             await db.SaveChangesAsync();
 
@@ -87,31 +93,53 @@ namespace Sale_Dance.Controllers
             }
 
             var sale = db.Sales.Find(id);
-            return View(sale);
+            var vm = new SaleViewModel()
+            {
+                Name = sale.Name,
+                BeforePrice = sale.BeforePrice,
+                Image = sale.Image.Bytes,
+                SalePrice = sale.SalePrice,
+                Description = sale.Description,
+                SaleId = sale.Id
+            };
+            return View(vm);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(int id, SaleViewModel vm)
+        public async Task<IActionResult> Edit(int id, SaleViewModel vm)
         {
           
             if (ModelState.IsValid)
             {
-                var saleFromDb = db.Sales.Find(id);
+                var saleFromDb = db.Sales.Single(x=>x.Id == id);
 
                 IFormFileCollection files = HttpContext.Request.Form.Files;
 
                 IFormFile formImage = files.FirstOrDefault();
                 if (formImage != null)
                 {
+                    var image = formImage.FormImageToResizedPng(400, 400);
+                    if (saleFromDb.Image != null)
+                    {
+                        saleFromDb.Image.Bytes = image;
 
-                    vm.Image = formImage.FormImageToResizedPng(250, 250);
+                    }
+                    else
+                    {
+                        saleFromDb.Image = new Image()
+                        {
+                            Bytes = image,
+                        };
+                    }
 
                 }
                 saleFromDb.Name = vm.Name;
                 saleFromDb.BeforePrice = vm.BeforePrice;
-                saleFromDb.AfterPrice = vm.AfterPrice;
-                db.SaveChanges();
+                saleFromDb.SalePrice = vm.SalePrice;
+                saleFromDb.LastEdited = DateTime.Now;
+                saleFromDb.Description = vm.Description;
+               await db.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
 
             }
@@ -161,5 +189,18 @@ namespace Sale_Dance.Controllers
             }
             return View(sale);
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RemoveImage(int id)
+        {
+            var user = await _signInManager.UserManager.GetUserAsync(User);
+            var sale = db.Sales.Single(x => x.UserId == user.Id && x.Id == id);
+            db.Images.Remove(sale.Image);
+            sale.Image = null;
+            db.SaveChanges();
+            return RedirectToAction("Edit", new{id});
+        }
+
     }
-}
+}   

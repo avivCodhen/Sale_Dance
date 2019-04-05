@@ -6,21 +6,16 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Sale Dance</title>
-
-    <environment include="Development">
-        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
-        <link rel="stylesheet" href="~/css/site.css" />
-    </environment>
-    <environment exclude="Development">
-        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
-        <link rel="stylesheet" href="~/css/site.css" />
-    </environment>
+    
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+  
 </head>
 <body dir="rtl" class="text-right">
 
 
 
-    <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
+    <nav class="nav navbar navbar-expand-md navbar-dark bg-dark fixed-top">
 
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -29,13 +24,14 @@
         <div class="collapse navbar-collapse">
             <ul class="navbar-nav mr-right">
                 <li class="nav-item">
-                    <a class="navbar-brand" asp-controller="Home" asp-action="Index">ויצמן </a>
+                    <span class="navbar-brand" style="color: #d71c4d;" asp-controller="Home" asp-action="Index">ויצמן </span>
                 </li>
 
                 @if (User.Identity.IsAuthenticated)
                 {
-                    <li class="nav-item"> <a class="nav-link" asp-controller="Sale" asp-action="Index">מבצעים</a></li>
-                    <li class="nav-item"> <a class="nav-link" asp-controller="Business" asp-action="Index">פרטי העסק</a></li>
+                    <li class="nav-item @(ViewContext.RouteData.Values["Controller"] != null && ViewContext.RouteData.Values["Controller"].ToString() == "Home" ? "active" : "")"> <a class="nav-link" asp-controller="Home" asp-action="Index">פוסטים</a></li>
+                    <li class="nav-item @(ViewContext.RouteData.Values["Controller"] != null && ViewContext.RouteData.Values["Controller"].ToString() == "Sale" ? "active" : "")"> <a class="nav-link" asp-controller="Sale" asp-action="Index">מבצעים</a></li>
+                    <li class="nav-item @(ViewContext.RouteData.Values["Controller"] != null && ViewContext.RouteData.Values["Controller"].ToString() == "Business" ? "active" : "")"> <a class="nav-link" asp-controller="Business" asp-action="Index">פרטי העסק</a></li>
                 }
 
                 @if (User.IsInRole(Constants.SuperAdmin))
@@ -51,9 +47,12 @@
 
 
 
-  
 
-    <partial name="_CookieConsentPartial" />
+
+    @*
+        <partial name="_CookieConsentPartial" />
+
+    *@
 
     <div class="container body-content">
         @RenderBody()
@@ -62,18 +61,20 @@
             <p>&copy; 2018 - Sale Dance</p>
         </footer>
     </div>
-
-    <environment include="Development">
-        <script src="~/lib/jquery/dist/jquery.js"></script>
-        <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
-        <script src="~/js/site.js" asp-append-version="true"></script>
-    </environment>
-    <environment exclude="Development">
-        <script src="~/lib/jquery/dist/jquery.js"></script>
-        <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
-        <script src="~/js/site.js" asp-append-version="true"></script>
-    </environment>
-
+    
+<script src="~/lib/jquery/dist/jquery.js"></script>
+<script src="~/js/cookie.js"></script>
+<script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
+<script src="~/js/site.js" asp-append-version="true"></script>
+<script>
+    $(function () {
+        $(".nav .nav-link").on("click", function () {
+            $(".nav").find(".active").removeClass("active");
+            $(this).addClass("active");
+        });
+    });
+    
+</script>
     @RenderSection("Scripts", required: false)
 </body>
 </html>

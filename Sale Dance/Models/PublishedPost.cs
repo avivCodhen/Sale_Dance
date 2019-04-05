@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,7 +9,7 @@ namespace Sale_Dance.Models
 {
     public class PublishedPost
     {
-        public int id { get; set; }
+        [Key] public int Id { get; set; }
         public int PostId { get; set; }
 
         [ForeignKey("PostId")]
@@ -16,6 +17,8 @@ namespace Sale_Dance.Models
 
         public int BusinessId { get; set; }
         
+
+        [ForeignKey("BusinessId")]
         public virtual Business Business { get; set; }
 
         public DateTime PublishTime = DateTime.Now;

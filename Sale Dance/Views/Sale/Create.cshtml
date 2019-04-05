@@ -24,6 +24,20 @@
             <span asp-validation-for="Name" class="text-danger"></span>
 
         </div>
+        
+        <div class="form-group row">
+
+            <div class="col-2">
+
+                <label> תיאור</label>
+                
+            </div>
+            <div class="col-5">
+                <textarea asp-for="Description" class="form-control"></textarea>
+            </div>
+            <span asp-validation-for="Description" class="text-danger"></span>
+
+        </div>
 
         <div class="form-group row">
 
@@ -56,13 +70,13 @@
 
             <div class="col-2">
 
-                <label> מחיר אחרי</label>
+                <label> מחיר מבצע</label>
 
             </div>
             <div class="col-2">
-                <input asp-for="AfterPrice" class="form-control" />
+                <input type="number" asp-for="SalePrice" class="form-control" />
             </div>
-            <span asp-validation-for="AfterPrice" class="text-danger"></span>
+            <span asp-validation-for="SalePrice" class="text-danger"></span>
 
         </div>
 

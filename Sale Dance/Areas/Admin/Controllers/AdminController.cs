@@ -29,14 +29,9 @@ namespace Sale_Dance.Areas.Identity.Pages.Admin.Controllers
             return View(userViewModel.Users);
         }
 
-        public IActionResult Details(string id)
+        public IActionResult Details(int id)
         {
-            if(id == null)
-            {
-                return NotFound();
-            }
-
-            userViewModel.UserBusiness = db.Businesses.Where(b => b.BusinessOwnerId == id).ToList();
+            userViewModel.UserBusiness = db.Businesses.Where(b => b.Id == id).ToList();
             return View(userViewModel);
 
         }

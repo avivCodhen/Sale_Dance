@@ -1,4 +1,5 @@
-﻿@model Sale_Dance.Models.Business
+﻿@using Sale_Dance.Utility
+@model Sale_Dance.Models.ViewModel.BusinessViewModel
 @{
     ViewData["Title"] = "פרטי העסק";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -14,156 +15,173 @@
 
 <h2 class="text-info">פרטי עסק</h2>
 
-<form method="post" asp-action="Update">
-    <input type="hidden" asp-for="id" />
+    <div class=" p-3 border rounded">
+        
+            <div class=" row no-gutters">
+                <div class=" col-8 ">
+                    <form method="post" enctype="multipart/form-data" asp-action="Update">
+                    <input type="hidden" asp-for="Id" />
 
-    <div class="p-4 border rounded">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <div class="form-group row">
 
-        <div asp-validation-summary"ModelOnly" class="text-danger"></div>
-        <div class="form-group row">
+                        <div class="col-4">
 
-            <div class="col-2">
+                            <label> כותרת לעסק</label>
+                        </div>
+                        <div class="col-6">
+                            <input asp-for="Name" class="form-control" />
+                        </div>
+                        <span asp-validation-for="Name" class="text-danger"></span>
 
-                <label> כותרת לעסק</label>
+                    </div>
+
+                    <div class="form-group row">
+
+                        <div class="col-4">
+
+                            <label> טלפון ליצירת קשר</label>
+                        </div>
+                        <div class="col-6">
+                            <input asp-for="BusinessPhoneContact" class="form-control" />
+                        </div>
+                        <span asp-validation-for="BusinessPhoneContact" class="text-danger"></span>
+
+                    </div>
+
+                    <div class="form-group row">
+
+                        <div class="col-4">
+
+                            <label> מייל ליצירת קשר</label>
+                        </div>
+                        <div class="col-6">
+                            <input asp-for="BusinessEmailContact" class="form-control" />
+                        </div>
+                        <span asp-validation-for="BusinessEmailContact" class="text-danger"></span>
+
+                    </div>
+
+                    <div class="form-group row">
+
+                        <div class="col-4">
+
+                            <label> אתר העסק</label>
+                        </div>
+                        <div class="col-6">
+                            <input asp-for="Site" class="form-control" />
+                        </div>
+                        <span asp-validation-for="Site" class="text-danger"></span>
+
+                    </div>
+
+                    <div class="form-group row">
+
+                        <div class="col-4">
+
+                            <label> כתובת העסק</label>
+                        </div>
+                        <div class="col-6">
+                            <input asp-for="Address" class="form-control" />
+                        </div>
+                        <span asp-validation-for="Address" class="text-danger"></span>
+
+                    </div>
+
+                    <div class="form-group row">
+
+                        <div class="col-4">
+
+                            <label> פרטים על העסק</label>
+                        </div>
+                        <div class="col-6">
+                            <textarea asp-for="About" class="form-control"></textarea>
+                        </div>
+                        <span asp-validation-for="About" class="text-danger"></span>
+
+                    </div>
+
+                    <div class="form-group row">
+
+                        <div class="col-4">
+
+                            <label> תמונה של העסק</label>
+                        </div>
+                        <div class="col-6">
+                            <input type="file" name="files" class="form-control text-left" />
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+
+                        <div class="col-4">
+
+                            <label> פתיחה וסגירה בימות השבוע</label>
+                        </div>
+                        <div class="col-6">
+                            <input asp-for="WeekDays" class="form-control" />
+                        </div>
+                        <span asp-validation-for="WeekDays" class="text-danger"></span>
+
+                    </div>
+
+                    <div class="form-group row">
+
+                        <div class="col-4">
+
+                            <label> פתיחה וסגירה בשישי</label>
+                        </div>
+                        <div class="col-6">
+                            <input asp-for="Friday" class="form-control" />
+                        </div>
+                        <span asp-validation-for="Friday" class="text-danger"></span>
+
+                    </div>
+
+
+                    <div class="form-group row">
+
+                        <div class="col-4">
+
+                            <label> פתיחה וסגירה בשבת</label>
+                        </div>
+                        <div class="col-6">
+                            <input asp-for="Saturday" class="form-control" />
+                        </div>
+                        <span asp-validation-for="Saturday" class="text-danger"></span>
+
+                    </div>
+
+
+
+                    <br />
+
+                    <div class="form-group">
+
+                        <input type="submit" class="btn btn-primary" value="שמור שינויים" />
+
+
+                    </div>
+                    </form>
+
+                </div>
+                <div class="col-4">
+                    @if (Model.Image != null)
+                    {
+                        <img src="@Model.Image.ImageToBase()" width="100%" style="border-radius:5px; border:1px solid #bbb9b9;" />
+                        <form method="post" asp-action="RemoveImage" asp-controller="Business">
+                            <button type="submit" class="btn btn-danger">הסר תמונה</button>
+                        </form>
+                    }
+                    else
+                    {
+                        <p>No Image Preview</p>
+                    }
+                </div>
             </div>
-            <div class="col-5">
-                <input asp-for="Name" class="form-control" />
-            </div>
-            <span asp-validation-for="Name" class="text-danger"></span>
-
-        </div>
-
-        <div class="form-group row">
-
-            <div class="col-2">
-
-                <label> טלפון ליצירת קשר</label>
-            </div>
-            <div class="col-5">
-                <input asp-for="BusinessPhoneContact" class="form-control" />
-            </div>
-            <span asp-validation-for="BusinessPhoneContact" class="text-danger"></span>
-
-        </div>
-
-        <div class="form-group row">
-
-            <div class="col-2">
-
-                <label> מייל ליצירת קשר</label>
-            </div>
-            <div class="col-5">
-                <input asp-for="BusinessEmailContact" class="form-control" />
-            </div>
-            <span asp-validation-for="BusinessEmailContact" class="text-danger"></span>
-
-        </div>
-
-        <div class="form-group row">
-
-            <div class="col-2">
-
-                <label> אתר העסק</label>
-            </div>
-            <div class="col-5">
-                <input asp-for="Site" class="form-control" />
-            </div>
-            <span asp-validation-for="Site" class="text-danger"></span>
-
-        </div>
-
-        <div class="form-group row">
-
-            <div class="col-2">
-
-                <label> כתובת העסק</label>
-            </div>
-            <div class="col-5">
-                <input asp-for="Address" class="form-control" />
-            </div>
-            <span asp-validation-for="Address" class="text-danger"></span>
-
-        </div>
-
-        <div class="form-group row">
-
-            <div class="col-2">
-
-                <label> פרטים על העסק</label>
-            </div>
-            <div class="col-5">
-                <input asp-for="About" class="form-control" />
-            </div>
-            <span asp-validation-for="About" class="text-danger"></span>
-
-        </div>
-
-        <div class="form-group row">
-
-            <div class="col-2">
-
-                <label> תמונה של העסק</label>
-            </div>
-            <div class="col-5">
-                <input asp-for="Site" class="form-control" />
-            </div>
-            <span asp-validation-for="Site" class="text-danger"></span>
-
-        </div>
-
-        <div class="form-group row">
-
-            <div class="col-2">
-
-                <label> פתיחה וסגירה בימות השבוע</label>
-            </div>
-            <div class="col-5">
-                <input asp-for="WeekDays" class="form-control" />
-            </div>
-            <span asp-validation-for="WeekDays" class="text-danger"></span>
-
-        </div>
-
-        <div class="form-group row">
-
-            <div class="col-2">
-
-                <label> פתיחה וסגירה בשישי</label>
-            </div>
-            <div class="col-5">
-                <input asp-for="Friday" class="form-control" />
-            </div>
-            <span asp-validation-for="Friday" class="text-danger"></span>
-
-        </div>
 
 
-        <div class="form-group row">
-
-            <div class="col-2">
-
-                <label> פתיחה וסגיר בשבת</label>
-            </div>
-            <div class="col-5">
-                <input asp-for="Saturday" class="form-control" />
-            </div>
-            <span asp-validation-for="Saturday" class="text-danger"></span>
-
-        </div>
-
-
-
-
-        <br />
-
-        <div class="form-group text-left">
-
-            <input type="submit" class="btn btn-primary" value="שמור שינויים" />
-
-
-        </div>
     </div>
-</form>
 
 @section Scripts{
 

@@ -5,33 +5,30 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 
 namespace Sale_Dance.Models
 {
     public class Post
     {
+        [Key] public int Id { get; set; }
 
-        public int id { get; set; }
+        public DateTime? LastEdited { get; set; }
+        public string UserId { get; set; }
 
-        public string OwnerId { get; set; }
 
-        [Required(ErrorMessage ="יש להזין כותרת")]
+        [ForeignKey("UserId")] public virtual ApplicationUser User { get; set; }
+
         public string Name { get; set; }
 
-        public string CreatedOn = DateTime.Now.ToString(CultureInfo.CreateSpecificCulture("en-GB"));
+        public DateTime Created = DateTime.Now;
 
-        public DateTime LastPublished{ get; set; }
+        public DateTime LastPublished { get; set; }
 
-        public virtual List<SalePost> Sales { get; set; }
+        public virtual ICollection<SalePost> SalePosts { get; set; }
 
         public bool IsPublished { get; set; }
 
-        [Required(ErrorMessage = "יש להזין תוכן הודעה")]
-        [StringLength(500, ErrorMessage = "יש להזין תוכן בין 4 עד 500 תווים", MinimumLength = 4)]
         public string Body { get; set; }
-
-
-        public virtual Business Business { get; set; }
-
     }
 }

@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Net.Mime;
 using System.Threading.Tasks;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
@@ -63,6 +64,12 @@ namespace Sale_Dance.Utility
                return memoryStream.ToArray();
            }
        }
+
+       public static string ImageToBase(this byte[] bytes)
+       {
+           string base64 = Convert.ToBase64String(bytes);
+           return $"data:image/gif;base64,{base64}";
+        }
 
     }
 }

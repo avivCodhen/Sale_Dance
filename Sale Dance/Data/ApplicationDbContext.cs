@@ -23,7 +23,7 @@ namespace Sale_Dance.Data
 
             modelBuilder.Entity<SalePost>()
                 .HasOne(p => p.Post)
-                .WithMany(x => x.Sales)
+                .WithMany(x => x.SalePosts)
                 .HasForeignKey(y => y.PostId);
 
             modelBuilder.Entity<SalePost>()
@@ -41,6 +41,9 @@ namespace Sale_Dance.Data
         public DbSet<PublishedPost> PublishedPosts{ get; set; }
         public DbSet<Business> Businesses{ get; set; }
         public DbSet<SalePost> SalePosts{ get; set; }
+        public DbSet<Image> Images { get; set; }
+
+
     }
 
     

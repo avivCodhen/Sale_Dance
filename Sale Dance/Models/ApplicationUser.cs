@@ -12,9 +12,13 @@ namespace Sale_Dance.Models
     {
         [Display(Name = "חנות")]
         public string Name { get; set; }
-
         [NotMapped]
         public bool IsSuperAdmin { get; set; }
+
+        public bool DontShowHelpfulSaleAlert { get; set; }
+
+
+
 
     }
 }

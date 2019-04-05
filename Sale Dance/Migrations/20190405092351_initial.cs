@@ -41,7 +41,8 @@ namespace Sale_Dance.Migrations
                     LockoutEnd = table.Column<DateTimeOffset>(nullable: true),
                     LockoutEnabled = table.Column<bool>(nullable: false),
                     AccessFailedCount = table.Column<int>(nullable: false),
-                    Name = table.Column<string>(nullable: true)
+                    Name = table.Column<string>(nullable: true),
+                    DontShowHelpfulSaleAlert = table.Column<bool>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -49,20 +50,17 @@ namespace Sale_Dance.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Sales",
+                name: "Images",
                 columns: table => new
                 {
-                    id = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    OwnderId = table.Column<string>(nullable: true),
-                    Name = table.Column<string>(nullable: false),
-                    Image = table.Column<byte[]>(nullable: true),
-                    BeforePrice = table.Column<double>(nullable: false),
-                    AfterPrice = table.Column<double>(nullable: false)
+                    Bytes = table.Column<byte[]>(nullable: true),
+                    SaleId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Sales", x => x.id);
+                    table.PrimaryKey("PK_Images", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -172,55 +170,92 @@ namespace Sale_Dance.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Businesses",
+                name: "Posts",
                 columns: table => new
                 {
-                    id = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    BusinessOwnerId = table.Column<string>(nullable: true),
+                    LastEdited = table.Column<DateTime>(nullable: true),
+                    UserId = table.Column<string>(nullable: true),
                     Name = table.Column<string>(nullable: true),
-                    BusinessEmailContact = table.Column<int>(nullable: false),
-                    Site = table.Column<string>(nullable: true),
-                    BusinessPhoneContact = table.Column<string>(nullable: true),
-                    About = table.Column<string>(nullable: true),
-                    Address = table.Column<string>(nullable: true),
-                    Image = table.Column<string>(nullable: true),
-                    WeekDays = table.Column<string>(nullable: true),
-                    Friday = table.Column<string>(nullable: true),
-                    Saturday = table.Column<string>(nullable: true)
+                    LastPublished = table.Column<DateTime>(nullable: false),
+                    IsPublished = table.Column<bool>(nullable: false),
+                    Body = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Businesses", x => x.id);
+                    table.PrimaryKey("PK_Posts", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Businesses_AspNetUsers_BusinessOwnerId",
-                        column: x => x.BusinessOwnerId,
+                        name: "FK_Posts_AspNetUsers_UserId",
+                        column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Posts",
+                name: "Businesses",
                 columns: table => new
                 {
-                    id = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    OwnerId = table.Column<string>(nullable: true),
-                    Name = table.Column<string>(nullable: false),
-                    LastPublished = table.Column<DateTime>(nullable: false),
-                    IsPublished = table.Column<bool>(nullable: false),
-                    Body = table.Column<string>(maxLength: 500, nullable: false),
-                    Businessid = table.Column<int>(nullable: true)
+                    UserId = table.Column<string>(nullable: true),
+                    Name = table.Column<string>(nullable: true),
+                    BusinessEmailContact = table.Column<string>(nullable: true),
+                    Site = table.Column<string>(nullable: true),
+                    BusinessPhoneContact = table.Column<string>(nullable: true),
+                    About = table.Column<string>(nullable: true),
+                    Address = table.Column<string>(nullable: true),
+                    ImageId = table.Column<int>(nullable: true),
+                    WeekDays = table.Column<string>(nullable: true),
+                    Friday = table.Column<string>(nullable: true),
+                    Saturday = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Posts", x => x.id);
+                    table.PrimaryKey("PK_Businesses", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Posts_Businesses_Businessid",
-                        column: x => x.Businessid,
-                        principalTable: "Businesses",
-                        principalColumn: "id",
+                        name: "FK_Businesses_Images_ImageId",
+                        column: x => x.ImageId,
+                        principalTable: "Images",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Businesses_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Sales",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    LastEdited = table.Column<DateTime>(nullable: true),
+                    UserId = table.Column<string>(nullable: true),
+                    Name = table.Column<string>(nullable: true),
+                    ImageId = table.Column<int>(nullable: true),
+                    BeforePrice = table.Column<double>(nullable: false),
+                    SalePrice = table.Column<double>(nullable: false),
+                    Description = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Sales", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Sales_Images_ImageId",
+                        column: x => x.ImageId,
+                        principalTable: "Images",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Sales_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
 
@@ -228,25 +263,25 @@ namespace Sale_Dance.Migrations
                 name: "PublishedPosts",
                 columns: table => new
                 {
-                    id = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     PostId = table.Column<int>(nullable: false),
                     BusinessId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_PublishedPosts", x => x.id);
+                    table.PrimaryKey("PK_PublishedPosts", x => x.Id);
                     table.ForeignKey(
                         name: "FK_PublishedPosts_Businesses_BusinessId",
                         column: x => x.BusinessId,
                         principalTable: "Businesses",
-                        principalColumn: "id",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_PublishedPosts_Posts_PostId",
                         column: x => x.PostId,
                         principalTable: "Posts",
-                        principalColumn: "id",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -254,8 +289,8 @@ namespace Sale_Dance.Migrations
                 name: "SalePosts",
                 columns: table => new
                 {
-                    SaleId = table.Column<int>(nullable: false),
-                    PostId = table.Column<int>(nullable: false)
+                    PostId = table.Column<int>(nullable: false),
+                    SaleId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -264,13 +299,13 @@ namespace Sale_Dance.Migrations
                         name: "FK_SalePosts_Posts_PostId",
                         column: x => x.PostId,
                         principalTable: "Posts",
-                        principalColumn: "id",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_SalePosts_Sales_SaleId",
                         column: x => x.SaleId,
                         principalTable: "Sales",
-                        principalColumn: "id",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -314,14 +349,19 @@ namespace Sale_Dance.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Businesses_BusinessOwnerId",
+                name: "IX_Businesses_ImageId",
                 table: "Businesses",
-                column: "BusinessOwnerId");
+                column: "ImageId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Posts_Businessid",
+                name: "IX_Businesses_UserId",
+                table: "Businesses",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Posts_UserId",
                 table: "Posts",
-                column: "Businessid");
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_PublishedPosts_BusinessId",
@@ -337,6 +377,16 @@ namespace Sale_Dance.Migrations
                 name: "IX_SalePosts_PostId",
                 table: "SalePosts",
                 column: "PostId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Sales_ImageId",
+                table: "Sales",
+                column: "ImageId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Sales_UserId",
+                table: "Sales",
+                column: "UserId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -366,13 +416,16 @@ namespace Sale_Dance.Migrations
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
+                name: "Businesses");
+
+            migrationBuilder.DropTable(
                 name: "Posts");
 
             migrationBuilder.DropTable(
                 name: "Sales");
 
             migrationBuilder.DropTable(
-                name: "Businesses");
+                name: "Images");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");

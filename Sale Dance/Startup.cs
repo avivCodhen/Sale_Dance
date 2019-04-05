@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Hosting;
@@ -46,18 +47,22 @@ namespace Sale_Dance
             }
 
                     );
-            services.AddIdentity<ApplicationUser, IdentityRole>()
+
+            services.AddIdentity<ApplicationUser, IdentityRole>(option =>
+                    {
+                        option.Password.RequireNonAlphanumeric = false;
+                    })
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultUI()
                 .AddDefaultTokenProviders();
-
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             //services.AddDefaultIdentity<IdentityUser>()
             //    .AddEntityFrameworkStores<ApplicationDbContext>();
 
             services.AddScoped<ISalePostService, SalePostService>();
             services.AddScoped<IPublishedPostsService, PublishedPostsService>();
-            
+            services.AddAutoMapper();
+            services.AddSession();
             services.AddMvc()
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
                 .AddJsonOptions(x => x.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
@@ -77,9 +82,9 @@ namespace Sale_Dance
                 app.UseHsts();
             }
 
+            app.UseSession();
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-            app.UseCookiePolicy();
 
             app.UseAuthentication();
 
@@ -94,11 +99,8 @@ namespace Sale_Dance
            template: "{area=Admin}/{controller=Admin}/{action=Index}/{id?}"
          );
             });
+            app.UseCookiePolicy();
 
-            AutoMapper.Mapper.Initialize(cfg =>
-            {
-
-            });
         }
     }
 }

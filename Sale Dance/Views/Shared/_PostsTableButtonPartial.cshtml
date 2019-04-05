@@ -10,18 +10,23 @@
         @if (@Model.IsPublished)
         {
 
-            <a type="button" class="btn btn-secondary m-1" href="@Url.Action("/UnPublish/"+Model.id)">הסר פרסום</a>
-            <a type="button" class="btn btn-info m-1" href="@Url.Action("/Bump/"+Model.id)">הקפץ פוסט</a>
+            <form method="post" asp-controller="Home" asp-action="Index" asp-route-id="@Model.Id" asp-route-postAction="@PostAction.Unpublish">
+                <button type="submit" class="btn btn-secondary m-1"> הסר פרסום</button>
+            </form>
+            <form method="post" asp-controller="Home" asp-action="Index" asp-route-id="@Model.Id" asp-route-postAction="@PostAction.Bump">
+                <button type="submit" class="btn btn-info m-1"> הקפץ פוסט</button>
+            </form>
 
         }
         else
         {
-            <a type="button" class="btn btn-info m-1" href="@Url.Action("/Publish/"+Model.id)">פרסם פוסט</a>
+            <form method="post" asp-controller="Home" asp-action="Index" asp-route-id="@Model.Id" asp-route-postAction="@PostAction.Publish">
+                <button type="submit" class="btn btn-info m-1">פרסם פוסט</button>
+            </form>
 
         }
-        <a type="button" class="btn btn-primary m-1" href="@Url.Action("/Edit/"+Model.id)">עריכה</a>
-        <a type="button" class="btn btn-success m-1" href="@Url.Action("/Details/"+Model.id)">פרטים</a>
-        <a type="button" class="btn btn-danger m-1" href="@Url.Action("/Delete/"+Model.id)">מחק</a>
+        <a class="btn btn-primary m-1" href="@Url.Action("/Edit/"+Model.Id)">עריכה</a>
+        <a class="btn btn-danger m-1" href="@Url.Action("/Delete/"+Model.Id)">מחק</a>
 
 
     </div>
@@ -44,7 +49,7 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary" data-dismiss="modal">ביטול</button>
                 <form method="post" asp-action="Delete">
-                    <input type="submit" asp-route-id="@Model.id" class="btn btn-danger" value="מחק פוסט" />
+                    <input type="submit" asp-route-id="@Model.Id" class="btn btn-danger" value="מחק פוסט" />
                     />
 
                 </form>
